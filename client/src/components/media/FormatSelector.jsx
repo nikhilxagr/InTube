@@ -3,7 +3,7 @@ import { Video, Music, Check } from 'lucide-react';
 import { Badge } from '../common/Badge.jsx';
 
 export function FormatSelector({ formats = [], selectedFormat, onSelectFormat }) {
-  const [activeTab, setActiveTab] = useState('all'); // 'all' | 'video' | 'audio'
+  const [activeTab, setActiveTab] = useState('all');
 
   const hasVideo = useMemo(() => formats.some((f) => f.type === 'video'), [formats]);
   const hasAudio = useMemo(() => formats.some((f) => f.type === 'audio'), [formats]);
@@ -35,15 +35,14 @@ export function FormatSelector({ formats = [], selectedFormat, onSelectFormat })
           Select Output Format
         </label>
 
-        {/* Filter tabs if both video and audio exist */}
         {hasVideo && hasAudio && (
-          <div className="flex items-center gap-1 p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg self-start">
+          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl self-start border border-slate-200/60 dark:border-slate-700/60">
             <button
               type="button"
               onClick={() => setActiveTab('all')}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === 'all'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -52,9 +51,9 @@ export function FormatSelector({ formats = [], selectedFormat, onSelectFormat })
             <button
               type="button"
               onClick={() => setActiveTab('video')}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === 'video'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -63,9 +62,9 @@ export function FormatSelector({ formats = [], selectedFormat, onSelectFormat })
             <button
               type="button"
               onClick={() => setActiveTab('audio')}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === 'audio'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -88,18 +87,18 @@ export function FormatSelector({ formats = [], selectedFormat, onSelectFormat })
               role="radio"
               aria-checked={isSelected}
               onClick={() => onSelectFormat(fmt)}
-              className={`flex items-center justify-between p-3.5 rounded-xl border text-left transition-all group ${
+              className={`flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all group backdrop-blur-md ${
                 isSelected
-                  ? 'border-brand-500 bg-brand-50/70 dark:bg-brand-950/50 ring-2 ring-brand-500/20 text-brand-950 dark:text-brand-100 shadow-sm'
-                  : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850 hover:border-slate-300 dark:hover:border-slate-700 text-slate-800 dark:text-slate-200'
+                  ? 'border-blue-500 bg-blue-50/80 dark:bg-blue-950/60 ring-2 ring-blue-500/30 text-blue-950 dark:text-blue-100 shadow-md shadow-blue-500/10'
+                  : 'border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 hover:border-blue-400/50 dark:hover:border-blue-500/50 text-slate-800 dark:text-slate-200'
               }`}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div
-                  className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
                     isVideo
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
-                      : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300'
+                      : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300'
                   }`}
                 >
                   {isVideo ? <Video className="w-4 h-4" /> : <Music className="w-4 h-4" />}
@@ -122,9 +121,9 @@ export function FormatSelector({ formats = [], selectedFormat, onSelectFormat })
               </div>
 
               <div
-                className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ml-2 transition-colors ${
+                className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ml-2 transition-all ${
                   isSelected
-                    ? 'bg-brand-600 text-white'
+                    ? 'bg-blue-600 text-white shadow-sm'
                     : 'border border-slate-300 dark:border-slate-700'
                 }`}
               >
