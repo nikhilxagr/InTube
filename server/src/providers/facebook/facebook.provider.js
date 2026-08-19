@@ -6,12 +6,13 @@ import { ytDlpService } from '../../services/ytdlp.service.js';
 import {
   AuthorizationRequiredError,
   MediaUnavailableError,
+  ProviderUnavailableError,
   UnsupportedMediaError
 } from '../../utils/errors.js';
 import { logger } from '../../utils/logger.js';
 
-export class YouTubeProvider extends ProviderInterface {
-  name = PLATFORMS.YOUTUBE;
+export class FacebookProvider extends ProviderInterface {
+  name = PLATFORMS.FACEBOOK;
 
   canHandle(parsedUrl) {
     const details = detectPlatformDetails(parsedUrl);
@@ -24,49 +25,61 @@ export class YouTubeProvider extends ProviderInterface {
   }
 
   async getMetadata(parsedUrl) {
-    const details = detectPlatformDetails(parsedUrl);
-    const mediaId = details.mediaId;
-
-    if (!mediaId) {
-      throw new MediaUnavailableError('Unable to extract YouTube video ID from URL.');
-    }
-
-    const videoUrl = `https://www.youtube.com/watch?v=${mediaId}`;
+    const videoUrl = parsedUrl.href;
 
     try {
       const info = await ytDlpService.getInfo(videoUrl);
 
-      if (info.is_live || info.live_status === 'is_live' || info.live_status === 'is_upcoming') {
-        throw new UnsupportedMediaError('Live stream content is not supported for downloading.');
-      }
-
-      const thumbnails = (info.thumbnails || []).sort((a, b) => (b.preference || 0) - (a.preference || 0));
-      const thumbnail =
-        thumbnails[0]?.url ||
-        info.thumbnail ||
-        `https://i.ytimg.com/vi/${mediaId}/hqdefault.jpg`;
+      const thumbnails = (info.thumbnails || []).sort(
+        (a, b) => (b.preference || 0) - (a.preference || 0)
+      );
+      const thumbnail = thumbnails[0]?.url || info.thumbnail || '';
 
       return {
-        id: mediaId,
+        id: info.id || String(Date.now()),
         url: videoUrl,
-        type: details.mediaType || 'video',
-        title: info.title || 'YouTube Video',
-        author: info.uploader || info.channel || '',
+        type: 'video',
+        title: info.title || info.description?.slice(0, 120) || 'Facebook Video',
+        author: info.uploader || info.channel || info.uploader_id || '',
         duration: info.duration || null,
         thumbnail,
-        ytFormats: info.formats || [],
-        ytInfo: info
+        fbFormats: info.formats || [],
+        fbInfo: info
       };
     } catch (err) {
+      const msg = (err.message || '').toLowerCase();
+
       if (
-        err instanceof AuthorizationRequiredError ||
-        err instanceof MediaUnavailableError ||
-        err instanceof UnsupportedMediaError
+        msg.includes('login') ||
+        msg.includes('sign in') ||
+        msg.includes('private') ||
+        msg.includes('age-restricted') ||
+        msg.includes('authorization')
       ) {
-        throw err;
+        throw new AuthorizationRequiredError(
+          'This Facebook video is private or requires login to access.'
+        );
       }
-      logger.error({ err: err.message, mediaId }, 'yt-dlp metadata fetch failed');
-      throw err;
+
+      if (
+        msg.includes('unavailable') ||
+        msg.includes('not found') ||
+        msg.includes('removed') ||
+        msg.includes('404')
+      ) {
+        throw new MediaUnavailableError(
+          'This Facebook video is unavailable or has been removed.'
+        );
+      }
+
+      if (msg.includes('live') || msg.includes('is_live')) {
+        throw new UnsupportedMediaError('Live Facebook streams cannot be downloaded.');
+      }
+
+      logger.error({ err: err.message, url: videoUrl }, 'Facebook yt-dlp metadata fetch failed');
+      throw new ProviderUnavailableError(
+        'Unable to access this Facebook video. Ensure it is a public post or video.'
+      );
     }
   }
 
@@ -76,7 +89,7 @@ export class YouTubeProvider extends ProviderInterface {
       type: raw?.type || 'video',
       id: raw?.id || '',
       url: raw?.url || '',
-      title: raw?.title || 'YouTube Video',
+      title: raw?.title || 'Facebook Video',
       author: raw?.author || '',
       duration: raw?.duration || null,
       thumbnail: raw?.thumbnail || '',
@@ -85,11 +98,11 @@ export class YouTubeProvider extends ProviderInterface {
   }
 
   getFormats(rawMetadata) {
-    const ytFormats = rawMetadata?.ytFormats || rawMetadata?.formats || [];
+    const fbFormats = rawMetadata?.fbFormats || rawMetadata?.formats || [];
     const formatsList = [];
     const seenHeights = new Set();
 
-    const videoFormats = ytFormats
+    const videoFormats = fbFormats
       .filter((f) => f.vcodec && f.vcodec !== 'none' && f.height && f.height >= 144)
       .sort((a, b) => (b.height || 0) - (a.height || 0));
 
@@ -124,10 +137,10 @@ export class YouTubeProvider extends ProviderInterface {
       });
     }
 
-    const hasAudioFormat = ytFormats.some(
+    const hasAudioFormat = fbFormats.some(
       (f) => f.acodec && f.acodec !== 'none' && (!f.vcodec || f.vcodec === 'none')
     );
-    if (hasAudioFormat || ytFormats.length > 0) {
+    if (hasAudioFormat || fbFormats.length > 0) {
       formatsList.push(
         {
           formatId: 'audio_mp3',
@@ -153,20 +166,9 @@ export class YouTubeProvider extends ProviderInterface {
     if (formatsList.length === 0) {
       return [
         {
-          formatId: 'video_1080p_mp4',
-          height: 1080,
+          formatId: 'video_hd_mp4',
           container: 'mp4',
-          quality: '1080p Full HD',
-          type: 'video',
-          hasAudio: true,
-          hasVideo: true,
-          approxSize: null
-        },
-        {
-          formatId: 'video_720p_mp4',
-          height: 720,
-          container: 'mp4',
-          quality: '720p HD',
+          quality: 'Best Available HD',
           type: 'video',
           hasAudio: true,
           hasVideo: true,
@@ -191,8 +193,8 @@ export class YouTubeProvider extends ProviderInterface {
     const { parsedUrl, formatId, container = 'mp4', type = 'video', jobDir } = options;
 
     const metadata = await this.getMetadata(parsedUrl);
-    const sanitizedTitle = sanitizeFilename(metadata.title, 'youtube_media');
-    const videoUrl = `https://www.youtube.com/watch?v=${metadata.id}`;
+    const sanitizedTitle = sanitizeFilename(metadata.title, 'facebook_video');
+    const videoUrl = metadata.url;
 
     if (type === 'audio' || formatId.startsWith('audio_')) {
       const targetExt = container === 'm4a' ? 'm4a' : 'mp3';
@@ -217,28 +219,24 @@ export class YouTubeProvider extends ProviderInterface {
 
     const finalPath = path.join(jobDir, `${sanitizedTitle}.mp4`);
 
-    const hlsIds = { 2160: '96', 1440: '96', 1080: '96', 720: '95', 480: '94', 360: '93', 240: '92', 144: '91' };
-    const allHeights = [2160, 1440, 1080, 720, 480, 360, 240, 144].filter(h => h <= targetHeight);
+    const allHeights = [2160, 1080, 720, 480, 360, 240, 144].filter(h => h <= targetHeight);
 
     for (const h of allHeights) {
-      const hlsId = hlsIds[h] || '93';
-
       const spec = [
-        hlsId,
         `bestvideo[height<=${h}][vcodec^=avc1]+bestaudio[ext=m4a]`,
         `bestvideo[height<=${h}][vcodec^=avc1]+bestaudio`,
         `bestvideo[height<=${h}]+bestaudio[ext=m4a]`,
         `bestvideo[height<=${h}]+bestaudio`,
-        `best[height<=${h}]`,
+        `best[height<=${h}]`
       ].join('/');
 
       try {
-        logger.info({ height: h, targetHeight, hlsId }, 'Attempting download (HLS preferred)');
+        logger.info({ height: h, targetHeight }, 'Facebook download attempt');
         await ytDlpService.download(videoUrl, finalPath, spec, {
           timeout: 300000,
           onProgress: options.onProgress
         });
-        logger.info({ height: h }, 'Download succeeded');
+        logger.info({ height: h }, 'Facebook download succeeded');
 
         return {
           filePath: finalPath,
@@ -248,16 +246,17 @@ export class YouTubeProvider extends ProviderInterface {
       } catch (err) {
         const msg = err.message || '';
         const is403 = msg.includes('403') || msg.includes('Forbidden') || msg.includes('HTTP Error');
-        const isHard = msg.includes('unavailable') || msg.includes('private') || msg.includes('removed');
+        const isHard =
+          msg.includes('unavailable') || msg.includes('private') || msg.includes('removed') || msg.includes('login');
 
-        if (isHard) throw err;
+        if (isHard) throw new MediaUnavailableError('This Facebook video is unavailable or private.');
         if (!is403 && !msg.includes('exit') && !msg.includes('failed')) throw err;
 
-        logger.warn({ height: h, err: msg.slice(0, 200) }, 'Height tier blocked — trying lower quality');
+        logger.warn({ height: h, err: msg.slice(0, 200) }, 'Facebook height tier failed, trying lower');
       }
     }
 
-    logger.warn({ targetHeight }, 'All height tiers failed — using unrestricted best available');
+    logger.warn({ targetHeight }, 'All Facebook height tiers failed, using best available');
     await ytDlpService.download(videoUrl, finalPath, 'best/worst', {
       timeout: 300000,
       onProgress: options.onProgress
@@ -271,4 +270,4 @@ export class YouTubeProvider extends ProviderInterface {
   }
 }
 
-export const youtubeProvider = new YouTubeProvider();
+export const facebookProvider = new FacebookProvider();

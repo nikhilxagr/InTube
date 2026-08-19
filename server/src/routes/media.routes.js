@@ -4,9 +4,9 @@ import { analyzeRateLimiter, downloadRateLimiter } from '../middleware/rate-limi
 
 export const mediaRouter = Router();
 
-// Health endpoint
 mediaRouter.get('/health', (req, res) => mediaController.health(req, res));
-
-// Media endpoints
 mediaRouter.post('/media/analyze', analyzeRateLimiter, (req, res, next) => mediaController.analyze(req, res, next));
+mediaRouter.post('/media/job', downloadRateLimiter, (req, res, next) => mediaController.startJob(req, res, next));
+mediaRouter.get('/media/job/:jobId/progress', (req, res) => mediaController.getJobProgress(req, res));
+mediaRouter.get('/media/job/:jobId/file', (req, res, next) => mediaController.getJobFile(req, res, next));
 mediaRouter.post('/media/download', downloadRateLimiter, (req, res, next) => mediaController.download(req, res, next));
