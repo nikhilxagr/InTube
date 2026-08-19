@@ -45,7 +45,7 @@ All endpoints are namespaced under `/api/v1`. All JSON responses follow a standa
 ## 2. Endpoints
 
 ### 2.1 Health Check
-Inspects application status, memory usage, and uptime.
+Inspects application status, memory usage, version, and uptime.
 
 - **URL**: `/api/v1/health`
 - **Method**: `GET`
@@ -60,9 +60,14 @@ Inspects application status, memory usage, and uptime.
     "status": "ok",
     "service": "intube-backend",
     "version": "1.0.0",
+    "nodeVersion": "v22.22.0",
+    "uptime": 174,
     "timestamp": "2026-08-19T02:00:00.000Z",
-    "uptime": 124.5,
-    "providers": ["youtube", "instagram"]
+    "providers": ["youtube", "instagram"],
+    "memory": {
+      "heapUsedMB": 10,
+      "heapTotalMB": 13
+    }
   }
 }
 ```
@@ -106,15 +111,6 @@ Validates a user-supplied URL, resolves the provider, fetches real metadata, and
         "approxSize": 45120000
       },
       {
-        "formatId": "video_720p",
-        "container": "mp4",
-        "quality": "720p",
-        "type": "video",
-        "hasAudio": true,
-        "hasVideo": true,
-        "approxSize": 22100000
-      },
-      {
         "formatId": "audio_mp3",
         "container": "mp3",
         "quality": "Audio 320kbps",
@@ -149,6 +145,6 @@ Processes the media file according to requested parameters and streams the outpu
 #### Response (200 OK)
 - **Headers**:
   - `Content-Type: video/mp4` (or `audio/mpeg`)
-  - `Content-Disposition: attachment; filename="Rick_Astley_-_Never_Gonna_Give_You_Up_720p.mp4"`
+  - `Content-Disposition: attachment; filename="media_720p.mp4"`
   - `Content-Length: <file size>`
 - **Body**: Binary Stream
