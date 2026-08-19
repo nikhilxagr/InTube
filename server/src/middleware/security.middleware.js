@@ -33,6 +33,7 @@ export const corsMiddleware = cors({
     return callback(new Error(`CORS blocked for origin: ${origin}`), false);
   },
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Accept', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Accept', 'X-Requested-With', 'X-Request-ID'],
+  exposedHeaders: ['Content-Disposition', 'Content-Length', 'X-Request-ID'],
   credentials: false
 });

@@ -29,6 +29,7 @@ const configSchema = z.object({
   // Storage and Binaries
   TEMP_DIR: z.string().default(path.resolve(__dirname, '../../temp')),
   FFMPEG_PATH: z.string().optional().default(''),
+  YTDLP_PATH: z.string().optional().default('yt-dlp'),
 
   // Logging
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info')
@@ -46,6 +47,7 @@ export const config = {
   isProduction: parsed.data.NODE_ENV === 'production',
   isDevelopment: parsed.data.NODE_ENV === 'development',
   isTest: parsed.data.NODE_ENV === 'test',
+  MAX_FILE_SIZE_BYTES: parsed.data.MAX_FILE_SIZE_MB * 1024 * 1024,
   resolvedTempDir: path.isAbsolute(parsed.data.TEMP_DIR)
     ? parsed.data.TEMP_DIR
     : path.resolve(__dirname, '../../', parsed.data.TEMP_DIR)

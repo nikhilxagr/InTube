@@ -14,7 +14,20 @@ export const logger = pino({
       }
     : undefined,
   redact: {
-    paths: ['req.headers.authorization', 'req.headers.cookie', 'url.search', 'query', '*.token', '*.password'],
+    paths: [
+      'req.headers.authorization',
+      'req.headers.cookie',
+      'req.headers["set-cookie"]',
+      'req.headers["x-auth-token"]',
+      'req.headers["x-api-key"]',
+      'url.search',
+      'query',
+      '*.token',
+      '*.password',
+      '*.secret',
+      '*.key',
+      '*.authorization'
+    ],
     remove: true
   }
 });

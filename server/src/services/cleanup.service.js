@@ -28,8 +28,12 @@ export class CleanupService {
   /**
    * Sweeps and purges leftover orphaned directories older than maxAgeMs.
    * @param {number} [maxAgeMs=3600000] - Default 1 hour
+   * @returns {Promise<{ scanned: number, removed: number }>}
    */
   async sweepOrphanedTempDirs(maxAgeMs = 3600000) {
+    let scanned = 0;
+    let removed = 0;
+
     try {
       await fs.mkdir(config.resolvedTempDir, { recursive: true });
       const entries = await fs.readdir(config.resolvedTempDir, { withFileTypes: true });
@@ -38,10 +42,12 @@ export class CleanupService {
       for (const entry of entries) {
         if (entry.name === '.gitkeep') continue;
         if (entry.isDirectory()) {
+          scanned++;
           const entryPath = path.join(config.resolvedTempDir, entry.name);
           const stat = await fs.stat(entryPath);
-          if (now - stat.mtimeMs > maxAgeMs) {
+          if (now - stat.mtimeMs >= maxAgeMs) {
             await fs.rm(entryPath, { recursive: true, force: true });
+            removed++;
             logger.info({ entryPath }, 'Swept stale temporary directory');
           }
         }
@@ -49,6 +55,8 @@ export class CleanupService {
     } catch (err) {
       logger.error({ err }, 'Error during orphaned temp directory sweep');
     }
+
+    return { scanned, removed };
   }
 }
 

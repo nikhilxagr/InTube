@@ -20,20 +20,31 @@ const createRateLimiter = ({ windowMs, max, message }) => {
   });
 };
 
-export const globalRateLimiter = createRateLimiter({
+export const globalRateLimiter = rateLimit({
   windowMs: config.RATE_LIMIT_WINDOW_MS,
-  max: config.RATE_LIMIT_MAX_REQUESTS,
-  message: 'Global rate limit exceeded. Please wait a few minutes before retrying.'
+  max: config.isDevelopment ? 5000 : 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.url.includes('/progress') || req.url.includes('/health'),
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error: {
+        code: ErrorCodes.RATE_LIMITED,
+        message: 'Global rate limit exceeded. Please wait a moment before retrying.'
+      }
+    });
+  }
 });
 
 export const analyzeRateLimiter = createRateLimiter({
   windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 30,
+  max: config.isDevelopment ? 500 : 100,
   message: 'Too many analysis requests. Please wait a moment before analyzing more URLs.'
 });
 
 export const downloadRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: config.DOWNLOAD_RATE_LIMIT_MAX,
+  max: config.isDevelopment ? 500 : 100,
   message: 'Download rate limit reached. Please wait before requesting additional media.'
 });

@@ -24,6 +24,18 @@ export function errorMiddleware(err, req, res, _next) {
     });
   }
 
+  // If it's an entity too large error from body-parser
+  if (err.type === 'entity.too.large' || err.status === 413 || err.statusCode === 413) {
+    logger.warn({ message: err.message }, 'Request entity exceeds allowable payload size');
+    return res.status(413).json({
+      success: false,
+      error: {
+        code: ErrorCodes.FILE_TOO_LARGE,
+        message: 'Request payload exceeds maximum allowable size of 50KB.'
+      }
+    });
+  }
+
   // If it's a CORS error
   if (err.message && err.message.startsWith('CORS blocked')) {
     logger.warn({ message: err.message }, 'CORS restriction triggered');

@@ -1,5 +1,6 @@
 import express from 'express';
 import pinoHttp from 'pino-http';
+import { requestIdMiddleware } from './middleware/request-id.middleware.js';
 import { helmetMiddleware, corsMiddleware } from './middleware/security.middleware.js';
 import { globalRateLimiter } from './middleware/rate-limit.middleware.js';
 import { notFoundMiddleware } from './middleware/not-found.middleware.js';
@@ -10,17 +11,21 @@ import { logger } from './utils/logger.js';
 export function createApp() {
   const app = express();
 
-  // Trust reverse proxies (e.g. Render / Cloudflare)
+  // Trust reverse proxies (e.g. Render / Vercel / Cloudflare)
   app.set('trust proxy', 1);
+
+  // Request correlation ID
+  app.use(requestIdMiddleware);
 
   // Security Headers & CORS
   app.use(helmetMiddleware);
   app.use(corsMiddleware);
 
-  // Structured HTTP Request Logging
+  // Structured HTTP Request Logging with Request Correlation ID
   app.use(
     pinoHttp({
       logger,
+      genReqId: (req) => req.id,
       autoLogging: {
         ignore: (req) => req.url === '/api/v1/health'
       },
@@ -29,7 +34,7 @@ export function createApp() {
         if (res.statusCode >= 400) return 'warn';
         return 'info';
       },
-      customSuccessMessage: (req, res) => `${req.method} ${req.url} completed with ${res.statusCode}`
+      customSuccessMessage: (req, res) => `[${req.id}] ${req.method} ${req.url} completed with ${res.statusCode}`
     })
   );
 

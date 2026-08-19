@@ -9,6 +9,7 @@ export const ErrorCodes = {
   FILE_TOO_LARGE: 'FILE_TOO_LARGE',
   PROCESSING_TIMEOUT: 'PROCESSING_TIMEOUT',
   RATE_LIMITED: 'RATE_LIMITED',
+  NOT_FOUND: 'NOT_FOUND',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR'
 };
 
@@ -88,5 +89,11 @@ export class ProcessingTimeoutError extends AppError {
 export class RateLimitedError extends AppError {
   constructor(message = 'Too many requests. Please slow down and try again later.') {
     super(ErrorCodes.RATE_LIMITED, message, 429);
+  }
+}
+
+export class NotFoundError extends AppError {
+  constructor(message = 'The requested resource was not found.') {
+    super(ErrorCodes.NOT_FOUND, message, 404);
   }
 }
