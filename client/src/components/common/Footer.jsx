@@ -10,7 +10,8 @@ export function Footer() {
           {/* Brand & Purpose */}
           <div className="md:col-span-1 space-y-3">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-xs">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white font-bold text-xs"
+                style={{ background: 'linear-gradient(135deg, #ef4444, #a855f7, #3b82f6)' }}>
                 IT
               </div>
               <span className="font-bold text-base text-slate-900 dark:text-white">InTube</span>
@@ -51,8 +52,13 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to={ROUTES.INSTAGRAM_STORIES} className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                <Link to={ROUTES.INSTAGRAM_STORIES} className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
                   Instagram Stories
+                </Link>
+              </li>
+              <li>
+                <Link to={ROUTES.FACEBOOK} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Facebook Videos
                 </Link>
               </li>
             </ul>

@@ -8,6 +8,7 @@ import { Instagram } from '../pages/Instagram.jsx';
 import { Reels } from '../pages/Reels.jsx';
 import { Stories } from '../pages/Stories.jsx';
 import { Posts } from '../pages/Posts.jsx';
+import { Facebook } from '../pages/Facebook.jsx';
 import { YouTube } from '../pages/YouTube.jsx';
 import { YouTubeVideo } from '../pages/YouTubeVideo.jsx';
 import { YouTubeShorts } from '../pages/YouTubeShorts.jsx';
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.INSTAGRAM_REELS, element: <Reels /> },
       { path: ROUTES.INSTAGRAM_STORIES, element: <Stories /> },
       { path: ROUTES.INSTAGRAM_POSTS, element: <Posts /> },
+      { path: ROUTES.FACEBOOK, element: <Facebook /> },
       { path: ROUTES.YOUTUBE, element: <YouTube /> },
       { path: ROUTES.YOUTUBE_VIDEO, element: <YouTubeVideo /> },
       { path: ROUTES.YOUTUBE_SHORTS, element: <YouTubeShorts /> },

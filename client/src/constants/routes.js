@@ -4,6 +4,7 @@ export const ROUTES = {
   INSTAGRAM_REELS: '/instagram/reels',
   INSTAGRAM_STORIES: '/instagram/stories',
   INSTAGRAM_POSTS: '/instagram/posts',
+  FACEBOOK: '/facebook',
   YOUTUBE: '/youtube',
   YOUTUBE_VIDEO: '/youtube/video',
   YOUTUBE_SHORTS: '/youtube/shorts',
