@@ -1,4 +1,4 @@
-import { apiClient } from './api.js';
+import { apiClient, API_BASE_URL } from './api.js';
 
 export const MediaService = {
   async getHealth() {
@@ -10,7 +10,8 @@ export const MediaService = {
   },
 
   async download(payload, onProgress) {
-    const startRes = await fetch('/api/v1/media/job', {
+    const baseUrl = API_BASE_URL.replace(/\/+$/, '');
+    const startRes = await fetch(`${baseUrl}/media/job`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -38,7 +39,7 @@ export const MediaService = {
 
       const pollInterval = setInterval(async () => {
         try {
-          const pollRes = await fetch(`/api/v1/media/job/${jobId}/progress`);
+          const pollRes = await fetch(`${baseUrl}/media/job/${jobId}/progress`);
           if (!pollRes.ok) {
             clearInterval(pollInterval);
             if (!isSettled) {
@@ -66,7 +67,7 @@ export const MediaService = {
             if (!isSettled) {
               isSettled = true;
 
-              const fileUrl = `/api/v1/media/job/${jobId}/file`;
+              const fileUrl = `${baseUrl}/media/job/${jobId}/file`;
               const link = document.createElement('a');
               link.href = fileUrl;
               link.setAttribute('download', job.filename || 'media.mp4');

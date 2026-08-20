@@ -14,6 +14,7 @@ const configSchema = z.object({
   PORT: z.coerce.number().default(5000),
   HOST: z.string().default('0.0.0.0'),
   FRONTEND_URL: z.string().default('http://localhost:5173'),
+  ALLOWED_ORIGINS: z.string().optional().default(''),
 
   // Limits
   MAX_FILE_SIZE_MB: z.coerce.number().default(100),
