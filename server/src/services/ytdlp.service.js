@@ -31,7 +31,7 @@ export class YtDlpService {
       '--no-warnings',
       '--js-runtimes', `node:${this.nodePath}`,
       '--remote-components', 'ejs:github',
-      '--extractor-args', 'youtube:player_client=ios,android,mweb,tv',
+      '--extractor-args', 'youtube:player_client=android_vr,ios,mweb,web_creator',
       '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
       '--socket-timeout', '30',
       '--retries', '3'
