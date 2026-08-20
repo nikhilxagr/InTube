@@ -1,13 +1,26 @@
 import { spawn } from 'child_process';
 import { existsSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import ffmpegStatic from 'ffmpeg-static';
 import { config } from '../config/config.js';
 import { MediaUnavailableError, ProcessingFailedError, ProcessingTimeoutError, UnsupportedMediaError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export class YtDlpService {
   constructor() {
-    this.binary = config.YTDLP_PATH || 'yt-dlp';
+    const isWindows = process.platform === 'win32';
+    const bundledBin = path.resolve(__dirname, `../../bin/${isWindows ? 'yt-dlp.exe' : 'yt-dlp'}`);
+
+    if (existsSync(bundledBin)) {
+      this.binary = bundledBin;
+    } else {
+      this.binary = config.YTDLP_PATH || 'yt-dlp';
+    }
+
     this.ffmpegBinary = config.FFMPEG_PATH || ffmpegStatic || 'ffmpeg';
     this.nodePath = process.execPath;
   }
@@ -18,8 +31,10 @@ export class YtDlpService {
       '--no-warnings',
       '--js-runtimes', `node:${this.nodePath}`,
       '--remote-components', 'ejs:github',
-      '--extractor-args', 'youtube:player_client=all',
-      '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+      '--extractor-args', 'youtube:player_client=ios,android,mweb,tv',
+      '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      '--socket-timeout', '30',
+      '--retries', '3'
     ];
 
     if (this.ffmpegBinary && existsSync(this.ffmpegBinary)) {
@@ -139,9 +154,7 @@ export class YtDlpService {
             errText.includes('private video') ||
             errText.includes('members-only') ||
             errText.includes('age-restricted') ||
-            errText.includes('age restriction') ||
-            errText.includes('login required') ||
-            errText.includes('sign in to confirm')
+            errText.includes('age restriction')
           ) {
             return reject(
               new MediaUnavailableError('This video is private, members-only, or age-restricted and cannot be downloaded.')
