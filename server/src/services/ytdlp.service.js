@@ -22,19 +22,17 @@ export class YtDlpService {
     }
 
     this.ffmpegBinary = config.FFMPEG_PATH || ffmpegStatic || 'ffmpeg';
-    this.nodePath = process.execPath;
   }
 
   getBaseArgs() {
     const args = [
       '--no-playlist',
       '--no-warnings',
-      '--js-runtimes', `node:${this.nodePath}`,
-      '--remote-components', 'ejs:github',
-      '--extractor-args', 'youtube:player_client=android_vr,ios,mweb,web_creator',
-      '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      '--extractor-args', 'youtube:player_client=tv,web_safari,mweb',
+      '--user-agent', 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebKit/538.1 (KHTML, like Gecko) SamsungBrowser/3.1 TV Safari/538.1',
       '--socket-timeout', '30',
-      '--retries', '3'
+      '--retries', '3',
+      '--no-check-certificates'
     ];
 
     if (this.ffmpegBinary && existsSync(this.ffmpegBinary)) {
@@ -113,9 +111,7 @@ export class YtDlpService {
       const timer = setTimeout(() => {
         if (!settled) {
           settled = true;
-          try {
-            proc.kill('SIGKILL');
-          } catch {}
+          try { proc.kill('SIGKILL'); } catch {}
           reject(new ProcessingTimeoutError(`yt-dlp operation exceeded ${timeoutMs}ms timeout.`));
         }
       }, timeoutMs);
@@ -141,11 +137,21 @@ export class YtDlpService {
           const errText = (stdout + stderr).toLowerCase();
 
           if (
+            errText.includes('sign in to confirm') ||
+            errText.includes('confirm you') ||
+            errText.includes('bot') ||
+            errText.includes('cookies')
+          ) {
+            return reject(new ProcessingFailedError(
+              'YouTube is blocking this server\'s IP address. The video is public but cannot be accessed from a cloud server. Please try again in a few minutes.'
+            ));
+          }
+
+          if (
             errText.includes('video unavailable') ||
             errText.includes('this video has been removed') ||
             errText.includes('no video with id') ||
-            errText.includes('this video is no longer available') ||
-            errText.includes('404')
+            errText.includes('this video is no longer available')
           ) {
             return reject(new MediaUnavailableError('This video is unavailable or has been removed.'));
           }
@@ -156,9 +162,7 @@ export class YtDlpService {
             errText.includes('age-restricted') ||
             errText.includes('age restriction')
           ) {
-            return reject(
-              new MediaUnavailableError('This video is private, members-only, or age-restricted and cannot be downloaded.')
-            );
+            return reject(new MediaUnavailableError('This video is private, members-only, or age-restricted and cannot be downloaded.'));
           }
 
           if (
