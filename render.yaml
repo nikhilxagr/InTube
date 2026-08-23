@@ -4,7 +4,7 @@ services:
     env: node
     plan: free
     region: oregon
-    buildCommand: npm install --prefix server && curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp
+    buildCommand: npm install --prefix server && (mkdir -p server/bin && curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o server/bin/yt-dlp && chmod +x server/bin/yt-dlp || true)
     startCommand: npm start --prefix server
     envVars:
       - key: NODE_ENV

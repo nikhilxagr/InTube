@@ -1,4 +1,5 @@
 import path from 'path';
+import { Innertube, UniversalCache } from 'youtubei.js';
 import { ProviderInterface } from '../provider.interface.js';
 import { PLATFORMS, detectPlatformDetails } from '../../utils/platform-detector.js';
 import { sanitizeFilename, getMimeType } from '../../utils/file-utils.js';
@@ -9,6 +10,17 @@ import {
   UnsupportedMediaError
 } from '../../utils/errors.js';
 import { logger } from '../../utils/logger.js';
+
+let innertubeInstance = null;
+async function getInnertube() {
+  if (!innertubeInstance) {
+    innertubeInstance = await Innertube.create({
+      cache: new UniversalCache(false),
+      generate_session_locally: true
+    });
+  }
+  return innertubeInstance;
+}
 
 export class YouTubeProvider extends ProviderInterface {
   name = PLATFORMS.YOUTUBE;
@@ -65,8 +77,53 @@ export class YouTubeProvider extends ProviderInterface {
       ) {
         throw err;
       }
-      logger.error({ err: err.message, mediaId }, 'yt-dlp metadata fetch failed');
-      throw err;
+
+      logger.warn({ err: err.message, mediaId }, 'yt-dlp metadata fetch failed, attempting Innertube fallback');
+
+      try {
+        const yt = await getInnertube();
+        const info = await yt.getInfo(mediaId);
+
+        if (info.basic_info.is_live) {
+          throw new UnsupportedMediaError('Live stream content is not supported for downloading.');
+        }
+
+        const rawThumbnails = info.basic_info.thumbnail || [];
+        const thumbnail = rawThumbnails[rawThumbnails.length - 1]?.url || `https://i.ytimg.com/vi/${mediaId}/hqdefault.jpg`;
+
+        const ytFormats = [
+          ...(info.streaming_data?.formats || []),
+          ...(info.streaming_data?.adaptive_formats || [])
+        ].map((f) => ({
+          format_id: String(f.itag),
+          ext: f.mime_type?.includes('mp4') ? 'mp4' : (f.mime_type?.includes('webm') ? 'webm' : 'm4a'),
+          width: f.width || null,
+          height: f.quality_label ? parseInt(f.quality_label) : (f.height || null),
+          format_note: f.quality_label || (f.has_video ? `${f.height}p` : 'audio'),
+          filesize: f.content_length ? parseInt(f.content_length) : null,
+          filesize_approx: f.approx_duration_ms && f.bitrate ? Math.round((f.bitrate * f.approx_duration_ms) / 8000) : null,
+          vcodec: f.has_video ? (f.mime_type?.split('codecs="')[1]?.split('"')[0] || 'avc1') : 'none',
+          acodec: f.has_audio ? (f.mime_type?.split('codecs="')[1]?.split('"')[0] || 'mp4a') : 'none',
+          tbr: f.bitrate ? Math.round(f.bitrate / 1000) : null,
+          fps: f.fps || null,
+          url: f.url || null
+        }));
+
+        return {
+          id: mediaId,
+          url: videoUrl,
+          type: details.mediaType || 'video',
+          title: info.basic_info.title || 'YouTube Video',
+          author: info.basic_info.author || '',
+          duration: info.basic_info.duration || null,
+          thumbnail,
+          ytFormats,
+          ytInfo: info
+        };
+      } catch (fallbackErr) {
+        logger.error({ fallbackErr: fallbackErr.message, mediaId }, 'Both yt-dlp and Innertube failed to fetch metadata');
+        throw err;
+      }
     }
   }
 

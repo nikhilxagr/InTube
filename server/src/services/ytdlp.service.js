@@ -28,8 +28,8 @@ export class YtDlpService {
     const args = [
       '--no-playlist',
       '--no-warnings',
-      '--extractor-args', 'youtube:player_client=tv,web_safari,mweb',
-      '--user-agent', 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebKit/538.1 (KHTML, like Gecko) SamsungBrowser/3.1 TV Safari/538.1',
+      '--extractor-args', 'youtube:player_skip=configs,webpage;player_client=android,android_vr,ios',
+      '--user-agent', 'com.google.android.youtube/19.29.37 (Linux; U; Android 14; US) gzip',
       '--socket-timeout', '30',
       '--retries', '3',
       '--no-check-certificates'
