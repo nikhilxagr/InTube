@@ -1,9 +1,11 @@
+import fsPromises from 'fs/promises';
 import path from 'path';
 import { Innertube, UniversalCache } from 'youtubei.js';
 import { ProviderInterface } from '../provider.interface.js';
 import { PLATFORMS, detectPlatformDetails } from '../../utils/platform-detector.js';
 import { sanitizeFilename, getMimeType } from '../../utils/file-utils.js';
 import { ytDlpService } from '../../services/ytdlp.service.js';
+import { ffmpegService } from '../../services/ffmpeg.service.js';
 import {
   AuthorizationRequiredError,
   MediaUnavailableError,
@@ -251,16 +253,33 @@ export class YouTubeProvider extends ProviderInterface {
     const sanitizedTitle = sanitizeFilename(metadata.title, 'youtube_media');
     const videoUrl = `https://www.youtube.com/watch?v=${metadata.id}`;
 
-    if (type === 'audio' || formatId.startsWith('audio_')) {
+    if (type === 'audio' || formatId.startsWith('audio_') || container === 'mp3' || container === 'm4a') {
       const targetExt = container === 'm4a' ? 'm4a' : 'mp3';
       const finalPath = path.join(jobDir, `${sanitizedTitle}.${targetExt}`);
+      const tempVideoPath = path.join(jobDir, `temp_yt_${Date.now()}.mp4`);
 
-      await ytDlpService.download(videoUrl, finalPath, 'ba[ext=m4a]/ba/b', {
-        audioOnly: true,
-        audioExt: targetExt,
-        timeout: 180000,
-        onProgress: options.onProgress
-      });
+      try {
+        await ytDlpService.download(videoUrl, finalPath, 'ba[ext=m4a]/ba/b/best', {
+          audioOnly: true,
+          audioExt: targetExt,
+          timeout: 180000,
+          onProgress: options.onProgress
+        });
+        await fsPromises.access(finalPath);
+      } catch (err) {
+        logger.warn({ err: err.message }, 'YouTube direct audio download failed, downloading stream and extracting with FFmpeg');
+        await ytDlpService.download(videoUrl, tempVideoPath, 'best', {
+          timeout: 180000,
+          onProgress: options.onProgress
+        });
+
+        await ffmpegService.extractAudio(tempVideoPath, finalPath, {
+          container: targetExt,
+          bitrate: '320k'
+        });
+
+        await fsPromises.unlink(tempVideoPath).catch(() => {});
+      }
 
       return {
         filePath: finalPath,

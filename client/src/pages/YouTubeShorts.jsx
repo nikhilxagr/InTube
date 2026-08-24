@@ -1,7 +1,7 @@
 import { Downloader } from '../components/downloader/Downloader.jsx';
 import { Card } from '../components/common/Card.jsx';
 import { SEO } from '../components/common/SEO.jsx';
-import { Zap, Smartphone, Sparkles } from 'lucide-react';
+import { Zap, Smartphone, CheckCircle2 } from 'lucide-react';
 
 export function YouTubeShorts() {
   return (
@@ -41,7 +41,7 @@ export function YouTubeShorts() {
 
         <Card className="p-6 space-y-2">
           <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold">
-            <Sparkles className="w-4 h-4 text-brand-600 dark:text-brand-400" />
+            <CheckCircle2 className="w-4 h-4 text-brand-600 dark:text-brand-400" />
             <h3>Zero Re-Compression</h3>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">

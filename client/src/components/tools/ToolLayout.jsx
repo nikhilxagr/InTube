@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, Wrench } from 'lucide-react';
 import { ROUTES } from '../../constants/routes.js';
 import { Badge } from '../common/Badge.jsx';
 import { SEO } from '../common/SEO.jsx';
@@ -9,7 +9,7 @@ export function ToolLayout({
   description,
   category = 'Utilities',
   badgeVariant = 'brand',
-  icon: Icon = Sparkles,
+  icon: Icon = Wrench,
   seoTitle = null,
   seoDescription = null,
   children

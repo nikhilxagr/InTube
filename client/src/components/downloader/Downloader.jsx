@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Search,
@@ -7,7 +7,6 @@ import {
   ArrowRight,
   RefreshCw,
   AlertCircle,
-  Sparkles,
   FileVideo,
   Music,
   Film,
@@ -18,6 +17,7 @@ import { Card } from '../common/Card.jsx';
 import { Alert } from '../common/Alert.jsx';
 import { Skeleton } from '../common/Skeleton.jsx';
 import { MediaPreview } from '../media/MediaPreview.jsx';
+import { DownloadSuccessCard } from '../common/DownloadSuccessCard.jsx';
 import { MediaService } from '../../services/media.service.js';
 import { DOWNLOADER_STATES } from '../../constants/downloader.js';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts.js';
@@ -31,7 +31,7 @@ export function Downloader({
   const [state, setState] = useState(DOWNLOADER_STATES.IDLE);
   const [mediaData, setMediaData] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [completedDownload, setCompletedDownload] = useState(null);
   const [selectedFormat, setSelectedFormat] = useState(null);
   const [validationHint, setValidationHint] = useState('');
   const [downloadProgress, setDownloadProgress] = useState(null);
@@ -72,6 +72,29 @@ export function Downloader({
     }
   }, []);
 
+  // Parse incoming Web Share Target URLs
+  useEffect(() => {
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const sharedUrl = searchParams.get('url') || searchParams.get('text') || searchParams.get('title');
+
+      if (sharedUrl && sharedUrl.trim()) {
+        const foundUrl = sharedUrl.match(/https?:\/\/[^\s]+/i);
+        const finalUrl = foundUrl ? foundUrl[0] : (sharedUrl.startsWith('http') ? sharedUrl.trim() : '');
+
+        if (finalUrl) {
+          setUrl(finalUrl);
+          validateInputLocally(finalUrl);
+          // Clean search params without reloading
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, '', cleanUrl);
+        }
+      }
+    } catch {
+      // Ignore URL search params read errors
+    }
+  }, [validateInputLocally]);
+
   const handleInputChange = (e) => {
     const val = e.target.value;
     setUrl(val);
@@ -109,7 +132,7 @@ export function Downloader({
     setState(DOWNLOADER_STATES.IDLE);
     setMediaData(null);
     setErrorMessage('');
-    setSuccessMessage('');
+    setCompletedDownload(null);
     setSelectedFormat(null);
     setValidationHint('');
     setDownloadProgress(null);
@@ -129,7 +152,7 @@ export function Downloader({
 
     setState(DOWNLOADER_STATES.ANALYZING);
     setErrorMessage('');
-    setSuccessMessage('');
+    setCompletedDownload(null);
     setMediaData(null);
     setDownloadProgress(null);
     setCountdown(null);
@@ -203,7 +226,7 @@ export function Downloader({
 
     setState(DOWNLOADER_STATES.PROCESSING);
     setErrorMessage('');
-    setSuccessMessage('');
+    setCompletedDownload(null);
     setDownloadProgress(null);
     setCountdown(10);
 
@@ -243,7 +266,12 @@ export function Downloader({
         }
       );
 
-      setSuccessMessage(`Downloaded "${result.filename}" successfully!`);
+      setCompletedDownload({
+        filename: result.filename,
+        mediaTitle: mediaData?.title,
+        platform: mediaData?.platform,
+        format
+      });
     } catch (err) {
       setErrorMessage(
         err.message || 'Download processing failed. The media may be restricted or temporarily unavailable.'
@@ -266,8 +294,8 @@ export function Downloader({
         onDragLeave={handleDragLeave}
         className={`relative p-2 sm:p-2.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border transition-all ${
           isDragOver
-            ? 'border-purple-500 ring-4 ring-purple-500/30 shadow-2xl scale-[1.01]'
-            : 'border-slate-200/80 dark:border-slate-800/80 shadow-2xl shadow-blue-500/5 dark:shadow-blue-500/10 ring-1 ring-slate-900/5 dark:ring-white/10'
+            ? 'border-blue-500 ring-2 ring-blue-500/30 shadow-2xl scale-[1.01]'
+            : 'border-slate-200/80 dark:border-slate-800/80 shadow-xl shadow-slate-900/5 dark:shadow-black/20'
         }`}
       >
         <form onSubmit={handleAnalyze} className="space-y-2.5" noValidate>
@@ -286,7 +314,7 @@ export function Downloader({
                 aria-label="Media URL input"
                 autoComplete="off"
                 spellCheck="false"
-                className="w-full pl-11 pr-24 py-3.5 sm:py-4 bg-slate-100/80 dark:bg-slate-950/70 border border-slate-200/80 dark:border-slate-800/80 rounded-xl text-sm sm:text-base text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500 transition-all shadow-inner"
+                className="w-full pl-11 pr-24 py-3.5 sm:py-4 bg-slate-100/80 dark:bg-slate-950/70 border border-slate-200/80 dark:border-slate-800/80 rounded-xl text-sm sm:text-base text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-inner"
                 disabled={state === DOWNLOADER_STATES.ANALYZING || state === DOWNLOADER_STATES.PROCESSING}
               />
               <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center gap-1.5">
@@ -346,9 +374,9 @@ export function Downloader({
                 Targeting: <strong className="font-semibold text-blue-600 dark:text-blue-400">{defaultPlatform}</strong>
               </span>
             ) : (
-              <span className="text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-purple-500 opacity-80" />
-                Supports YouTube, Instagram Reels &amp; Posts, and Facebook Videos (or drag local file).
+              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                Supports YouTube, Instagram Reels &amp; Posts, Facebook Videos, or drop a video file to convert.
               </span>
             )}
           </div>
@@ -408,11 +436,15 @@ export function Downloader({
         </Card>
       )}
 
-      {successMessage && (
-        <Alert
-          type="success"
-          title="Download Complete"
-          message={successMessage}
+      {completedDownload && (
+        <DownloadSuccessCard
+          filename={completedDownload.filename}
+          mediaTitle={completedDownload.mediaTitle}
+          platform={completedDownload.platform}
+          format={completedDownload.format}
+          onDownloadAgain={() => handleDownload(completedDownload.format)}
+          onReset={handleClear}
+          onClose={() => setCompletedDownload(null)}
         />
       )}
 

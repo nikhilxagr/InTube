@@ -15,7 +15,6 @@ import {
   ArrowRight,
   HelpCircle,
   FileCheck2,
-  Sparkles,
   Music,
   Film,
   Image as ImageIcon,
@@ -126,7 +125,7 @@ export function Home() {
             borderColor: 'rgba(168,85,247,0.25)',
             color: '#c084fc'
           }}>
-          <Sparkles className="w-3.5 h-3.5" />
+          <Wrench className="w-3.5 h-3.5 text-purple-400" />
           <span>Universal Media Toolkit • Downloader · Converters · Utilities · QR Transfer</span>
         </div>
 
@@ -140,8 +139,8 @@ export function Home() {
           Download from YouTube, Instagram, and Facebook, extract studio audio, transcode video formats, and beam files to your phone. 100% free and private.
         </p>
 
-        {/* Downloader with animated tri-colour border */}
-        <div className="pt-3 gradient-border-animated rounded-2xl">
+        {/* Downloader */}
+        <div className="pt-3">
           <Downloader />
         </div>
       </section>

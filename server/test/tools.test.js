@@ -7,6 +7,8 @@ import { transferService } from '../src/services/transfer.service.js';
 import { ffmpegService } from '../src/services/ffmpeg.service.js';
 import { createJobDirectory } from '../src/utils/file-utils.js';
 
+import { tempFileManager } from '../src/services/temp-file-manager.service.js';
+
 describe('Media Tools & QR Transfer Suite', () => {
   let server;
   let baseUrl;
@@ -36,6 +38,8 @@ describe('Media Tools & QR Transfer Suite', () => {
     if (testJobDir) {
       await fs.promises.rm(testJobDir, { recursive: true, force: true }).catch(() => {});
     }
+    tempFileManager.stopPeriodicSweep();
+    transferService.stopPeriodicSweep();
   });
 
   describe('FFmpeg Argument Builders', () => {

@@ -19,10 +19,16 @@ const configSchema = z.object({
   // Limits
   MAX_FILE_SIZE_MB: z.coerce.number().default(100),
   MAX_UPLOAD_SIZE_MB: z.coerce.number().default(50),
-  MAX_PROCESSING_TIME_MS: z.coerce.number().default(120000),
+  MAX_PROCESSING_TIME_MS: z.coerce.number().default(180000),
+  MAX_PROCESSING_TIME_SECONDS: z.coerce.number().default(180),
   MAX_TEMP_STORAGE_MB: z.coerce.number().default(1024),
   MAX_CONCURRENT_JOBS: z.coerce.number().default(5),
   TRANSFER_EXPIRATION_SECONDS: z.coerce.number().default(600),
+  TEMP_FILE_TTL_SECONDS: z.coerce.number().default(600),
+  MAX_BATCH_SIZE: z.coerce.number().default(5),
+  MAX_FRAME_COUNT: z.coerce.number().default(30),
+  MAX_VIDEO_DURATION_SECONDS: z.coerce.number().default(600),
+  MAX_IMAGE_PIXELS: z.coerce.number().default(25000000),
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(15 * 60 * 1000),

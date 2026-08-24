@@ -164,6 +164,25 @@ export class TransferService {
       await this.revokeTransfer(token);
     }
   }
+
+  /**
+   * Alias for getTransferForDownload / getTransfer.
+   * @param {string} token
+   * @returns {object}
+   */
+  getTransfer(token) {
+    return this.getTransferForDownload(token);
+  }
+
+  /**
+   * Stops the background sweep interval timer.
+   */
+  stopPeriodicSweep() {
+    if (this.sweepInterval) {
+      globalThis.clearInterval(this.sweepInterval);
+      this.sweepInterval = null;
+    }
+  }
 }
 
 export const transferService = new TransferService();

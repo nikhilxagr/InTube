@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes.js';
 import { useTheme } from '../../hooks/useTheme.js';
 import { KeyboardShortcutDialog } from './KeyboardShortcutDialog.jsx';
+import { CommandPalette } from '../command-palette/CommandPalette.jsx';
+import { InstallAppButton } from './InstallAppButton.jsx';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts.js';
 import {
   Sun,
@@ -14,26 +16,31 @@ import {
   Instagram,
   Wrench,
   HelpCircle,
-  Keyboard,
   ChevronDown,
   Music,
   Film,
   Image as ImageIcon,
-  Smartphone
+  Smartphone,
+  Search,
+  Layers,
+  Shield
 } from 'lucide-react';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
 
   // Register global shortcuts
   useKeyboardShortcuts({
     onToggleShortcuts: () => setShortcutsOpen((prev) => !prev),
+    onOpenCommandPalette: () => setCommandPaletteOpen((prev) => !prev),
     onEscape: () => {
       setShortcutsOpen(false);
+      setCommandPaletteOpen(false);
       setToolsDropdownOpen(false);
       setMobileMenuOpen(false);
     }
@@ -56,8 +63,12 @@ export function Header() {
   ];
 
   const quickTools = [
+    { label: 'Batch Downloader', path: ROUTES.TOOLS_BATCH, icon: Layers, desc: 'Multi-URL queue' },
     { label: 'Video → Audio', path: ROUTES.TOOLS_VIDEO_TO_AUDIO, icon: Music, desc: 'Extract MP3 / WAV' },
+    { label: 'Audio Converter', path: ROUTES.TOOLS_AUDIO_CONVERTER, icon: Music, desc: 'Convert audio types' },
     { label: 'Video Converter', path: ROUTES.TOOLS_CONVERTER, icon: Film, desc: 'MP4 / WebM / MOV' },
+    { label: 'Video → Frames', path: ROUTES.TOOLS_VIDEO_TO_IMAGE, icon: ImageIcon, desc: 'Extract JPG / ZIP' },
+    { label: 'Image Tools', path: ROUTES.TOOLS_IMAGE, icon: ImageIcon, desc: 'Compress, convert, resize' },
     { label: 'Thumbnail Downloader', path: ROUTES.TOOLS_THUMBNAIL, icon: ImageIcon, desc: 'Official HD covers' },
     { label: 'QR Mobile Transfer', path: ROUTES.TOOLS_QR_TRANSFER, icon: Smartphone, desc: 'Direct to phone' }
   ];
@@ -72,126 +83,128 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200/70 dark:border-slate-800/70 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Logo */}
-        <Link to={ROUTES.HOME} className="flex items-center gap-2.5 group">
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105"
-            style={{ background: 'linear-gradient(135deg, #ef4444 0%, #ec4899 35%, #a855f7 65%, #3b82f6 100%)' }}
-          >
-            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-              <path d="M10 8.5v7l6-3.5-6-3.5z" />
-              <path d="M19.5 3H4.5A2.5 2.5 0 002 5.5v13A2.5 2.5 0 004.5 21h15a2.5 2.5 0 002.5-2.5v-13A2.5 2.5 0 0019.5 3zm.5 15.5a.5.5 0 01-.5.5H4.5a.5.5 0 01-.5-.5v-13a.5.5 0 01.5-.5h15a.5.5 0 01.5.5v13z" />
-            </svg>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+        {/* Brand Logo */}
+        <Link to={ROUTES.HOME} className="flex items-center gap-2.5 shrink-0 group">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-transform duration-200">
+            <PlaySquare className="w-5 h-5 fill-white/20" />
           </div>
-          <span className="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white">
-            In<span className="text-gradient-tri">Tube</span>
-          </span>
+          <div className="flex flex-col">
+            <span className="font-black text-lg sm:text-xl tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 dark:from-white dark:via-blue-200 dark:to-white bg-clip-text text-transparent">
+              InTube
+            </span>
+            <span className="text-[10px] font-semibold tracking-wider text-blue-600 dark:text-blue-400 uppercase -mt-1">
+              Media Toolkit
+            </span>
+          </div>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1.5">
-          {/* Tools Menu with Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => setToolsDropdownOpen(true)}
-            onMouseLeave={() => setToolsDropdownOpen(false)}
-          >
-            <Link
-              to={ROUTES.TOOLS}
-              className={`px-3 py-1.5 text-sm font-semibold rounded-xl transition-all flex items-center gap-1.5 ${
-                isToolsActive
-                  ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 border border-purple-200/60 dark:border-purple-800/60 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center gap-1.5" aria-label="Main Navigation">
+          {mainLinks.map((link) => {
+            const active = isActive(link.path);
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                  active
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 shadow-sm'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{link.label}</span>
+              </Link>
+            );
+          })}
+
+          {/* Tools Mega Dropdown */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setToolsDropdownOpen((prev) => !prev)}
+              onBlur={() => setTimeout(() => setToolsDropdownOpen(false), 200)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                isToolsActive || toolsDropdownOpen
+                  ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
               }`}
             >
-              <Wrench className="w-4 h-4 text-purple-500" />
+              <Wrench className="w-4 h-4" />
               <span>Tools</span>
-              <span className="px-1.5 py-0.2 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 text-[10px] font-bold">
-                New
-              </span>
-              <ChevronDown className="w-3.5 h-3.5 opacity-60 ml-0.5" />
-            </Link>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${toolsDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
 
             {toolsDropdownOpen && (
-              <div className="absolute top-full left-0 w-64 pt-2 animate-fadeIn z-50">
-                <div className="p-2 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/80 dark:border-slate-800/80 shadow-2xl backdrop-blur-2xl space-y-1">
-                  <div className="px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Media Utilities
-                  </div>
-                  {quickTools.map((qt) => (
-                    <Link
-                      key={qt.path}
-                      to={qt.path}
-                      onClick={() => setToolsDropdownOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                        <qt.icon className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-purple-600 dark:group-hover:text-purple-400">
-                          {qt.label}
+              <div className="absolute right-0 mt-2 w-72 p-2 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-800/80 backdrop-blur-xl z-50 animate-fadeIn">
+                <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800/80 mb-1 flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Media Utilities</span>
+                  <Link
+                    to={ROUTES.TOOLS}
+                    onClick={() => setToolsDropdownOpen(false)}
+                    className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    View All →
+                  </Link>
+                </div>
+
+                <div className="space-y-1 max-h-80 overflow-y-auto">
+                  {quickTools.map((t) => {
+                    const Icon = t.icon;
+                    return (
+                      <Link
+                        key={t.path}
+                        to={t.path}
+                        onClick={() => setToolsDropdownOpen(false)}
+                        className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Icon className="w-4 h-4" />
                         </div>
-                        <div className="text-[10px] text-slate-400">{qt.desc}</div>
-                      </div>
-                    </Link>
-                  ))}
-                  <div className="border-t border-slate-100 dark:border-slate-800 pt-1">
-                    <Link
-                      to={ROUTES.TOOLS}
-                      onClick={() => setToolsDropdownOpen(false)}
-                      className="block px-3 py-2 text-center text-xs font-bold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/50 rounded-xl transition-colors"
-                    >
-                      Explore All Tools →
-                    </Link>
-                  </div>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                            {t.label}
+                          </div>
+                          <div className="text-[10px] text-slate-400 truncate">
+                            {t.desc}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             )}
           </div>
-
-          {mainLinks.map((item) => {
-            const active = isActive(item.path);
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`px-3 py-1.5 text-sm font-medium rounded-xl transition-all flex items-center gap-1.5 ${
-                  active
-                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 border border-blue-200/60 dark:border-blue-800/60 font-semibold shadow-sm'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
-                }`}
-              >
-                <item.icon className="w-4 h-4 opacity-75" />
-                {item.label}
-              </Link>
-            );
-          })}
         </nav>
 
-        {/* Right Controls */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Keyboard Shortcuts Trigger */}
+        {/* Right Actions */}
+        <div className="flex items-center gap-2">
+          {/* Command Palette Trigger Button (Visible on Mobile & Desktop) */}
           <button
             type="button"
-            onClick={() => setShortcutsOpen(true)}
-            title="Keyboard Shortcuts (?)"
-            aria-label="Keyboard shortcuts guide"
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium transition-all shadow-sm"
+            onClick={() => setCommandPaletteOpen(true)}
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-100/60 dark:bg-slate-900/60 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 transition-all text-xs font-medium"
+            title="Search tools (Ctrl+K)"
+            aria-label="Open search command palette"
           >
-            <Keyboard className="w-3.5 h-3.5 text-purple-500" />
-            <span className="font-mono text-[10px] bg-slate-200/70 dark:bg-slate-800 px-1 py-0.2 rounded font-bold">?</span>
+            <Search className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-blue-500" />
+            <span className="hidden md:inline text-[11px] text-slate-500 dark:text-slate-400">Search tools...</span>
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-white dark:bg-slate-800 text-slate-500 rounded border border-slate-200 dark:border-slate-700">
+              ⌘K
+            </kbd>
           </button>
 
-          {/* Theme Toggle */}
+          {/* Theme Toggle Button */}
           <button
             type="button"
             onClick={toggleTheme}
-            aria-label="Toggle theme"
-            className="p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm"
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
           >
-            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
           </button>
 
           {/* Mobile Menu Button */}
@@ -199,60 +212,114 @@ export function Header() {
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation menu"
-            className="md:hidden p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm"
+            className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-4 pt-3 pb-5 space-y-2 shadow-xl">
-          <Link
-            to={ROUTES.TOOLS}
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between p-3 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold text-sm border border-purple-200 dark:border-purple-800"
+        <div className="lg:hidden border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl px-4 py-5 space-y-4 animate-fadeIn">
+          {/* Mobile Command Palette Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              setCommandPaletteOpen(true);
+            }}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 text-xs font-semibold hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-colors"
           >
-            <span className="flex items-center gap-2.5">
-              <Wrench className="w-4 h-4 text-purple-500" />
-              <span>Media Toolbox (All Tools)</span>
+            <span className="flex items-center gap-2">
+              <Search className="w-4 h-4 text-blue-500" /> Search Tools & Features
             </span>
-            <span className="px-2 py-0.5 rounded-md bg-purple-600 text-white text-[10px]">
-              New
-            </span>
-          </Link>
+            <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">
+              ⌘K
+            </kbd>
+          </button>
 
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            {quickTools.map((qt) => (
-              <Link
-                key={qt.path}
-                to={qt.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100/70 dark:bg-slate-800/70 text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-purple-950"
-              >
-                <qt.icon className="w-3.5 h-3.5 text-purple-500 shrink-0" />
-                <span className="truncate">{qt.label}</span>
-              </Link>
-            ))}
+          {/* Mobile PWA Install Button inside hamburger drawer */}
+          <div>
+            <InstallAppButton className="w-full justify-center py-2.5 shadow-sm" variant="outline" size="md" />
           </div>
 
-          <div className="border-t border-slate-200 dark:border-slate-800 pt-2 space-y-1">
-            {mainLinks.map((item) => (
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3">
+              Media Platforms
+            </span>
+            {mainLinks.map((link) => {
+              const active = isActive(link.path);
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                    active
+                      ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50'
+                      : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{link.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="space-y-1 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between px-3 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Media Toolbox
+              </span>
               <Link
-                key={item.path}
-                to={item.path}
+                to={ROUTES.TOOLS}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                  isActive(item.path)
-                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 font-semibold'
-                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
+                className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline"
               >
-                <item.icon className="w-4 h-4 opacity-80" />
-                {item.label}
+                All Tools →
               </Link>
-            ))}
+            </div>
+
+            <div className="grid grid-cols-2 gap-1.5">
+              {quickTools.map((t) => {
+                const Icon = t.icon;
+                return (
+                  <Link
+                    key={t.path}
+                    to={t.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 p-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  >
+                    <Icon className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                    <span className="truncate">{t.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between px-1 text-xs text-slate-500">
+            <Link
+              to={ROUTES.PRIVACY}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white"
+            >
+              <Shield className="w-3.5 h-3.5" /> Privacy & Terms
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setShortcutsOpen(true);
+              }}
+              className="hover:text-slate-900 dark:hover:text-white"
+            >
+              Shortcuts (?)
+            </button>
           </div>
         </div>
       )}
@@ -261,6 +328,16 @@ export function Header() {
       <KeyboardShortcutDialog
         isOpen={shortcutsOpen}
         onClose={() => setShortcutsOpen(false)}
+      />
+
+      {/* Command Palette Modal */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        onOpenShortcuts={() => {
+          setCommandPaletteOpen(false);
+          setShortcutsOpen(true);
+        }}
       />
     </header>
   );

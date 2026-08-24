@@ -1,6 +1,6 @@
 import { Card } from '../components/common/Card.jsx';
 import { SEO } from '../components/common/SEO.jsx';
-import { Info, ShieldCheck, Sparkles } from 'lucide-react';
+import { Info, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export function About() {
   return (
@@ -47,7 +47,7 @@ export function About() {
 
           <Card className="p-6 space-y-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <Sparkles className="w-5 h-5" />
+              <CheckCircle2 className="w-5 h-5" />
             </div>
             <h3 className="font-bold text-base text-slate-900 dark:text-white">Authentic Formats</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">

@@ -1,8 +1,10 @@
+import fsPromises from 'fs/promises';
 import path from 'path';
 import { ProviderInterface } from '../provider.interface.js';
 import { PLATFORMS, detectPlatformDetails } from '../../utils/platform-detector.js';
 import { sanitizeFilename, getMimeType } from '../../utils/file-utils.js';
 import { ytDlpService } from '../../services/ytdlp.service.js';
+import { ffmpegService } from '../../services/ffmpeg.service.js';
 import {
   AuthorizationRequiredError,
   MediaUnavailableError,
@@ -235,11 +237,12 @@ export class InstagramProvider extends ProviderInterface {
   }
 
   async processDownload(options) {
-    const { parsedUrl, formatId, jobDir } = options;
+    const { parsedUrl, formatId, container = 'mp4', type = 'video', jobDir } = options;
     const metadata = await this.getMetadata(parsedUrl);
     const sanitizedTitle = sanitizeFilename(metadata.title, 'instagram_media');
     const videoUrl = metadata.url;
 
+    // 1. Photo download
     if (metadata.type === 'photo' || metadata.type === 'image' || formatId === 'photo_jpg') {
       const finalPath = path.join(jobDir, `${sanitizedTitle}.jpg`);
 
@@ -260,6 +263,58 @@ export class InstagramProvider extends ProviderInterface {
       };
     }
 
+    // 2. Audio extraction
+    if (type === 'audio' || formatId.startsWith('audio_') || container === 'mp3' || container === 'm4a') {
+      const targetExt = container === 'm4a' ? 'm4a' : 'mp3';
+      const finalPath = path.join(jobDir, `${sanitizedTitle}.${targetExt}`);
+      const tempVideoPath = path.join(jobDir, `temp_ig_${Date.now()}.mp4`);
+
+      try {
+        await ytDlpService.run([
+          '--no-playlist', '--no-warnings',
+          '-f', 'bestvideo+bestaudio/best',
+          '--extract-audio',
+          '--audio-format', targetExt,
+          '--audio-quality', '0',
+          '--ffmpeg-location', ytDlpService.ffmpegBinary,
+          '-o', finalPath,
+          videoUrl
+        ], {
+          timeout: 120000,
+          onProgress: options.onProgress
+        });
+
+        await fsPromises.access(finalPath);
+      } catch (dlErr) {
+        logger.warn({ err: dlErr.message }, 'Direct yt-dlp audio extraction failed on Instagram, downloading video and extracting audio with FFmpeg');
+        await ytDlpService.run([
+          '--no-playlist', '--no-warnings',
+          '-f', 'bestvideo+bestaudio/best',
+          '--merge-output-format', 'mp4',
+          '--ffmpeg-location', ytDlpService.ffmpegBinary,
+          '-o', tempVideoPath,
+          videoUrl
+        ], {
+          timeout: 120000,
+          onProgress: options.onProgress
+        });
+
+        await ffmpegService.extractAudio(tempVideoPath, finalPath, {
+          container: targetExt,
+          bitrate: '320k'
+        });
+
+        await fsPromises.unlink(tempVideoPath).catch(() => {});
+      }
+
+      return {
+        filePath: finalPath,
+        filename: `${sanitizedTitle}.${targetExt}`,
+        mimeType: getMimeType(targetExt)
+      };
+    }
+
+    // 3. Video download
     const finalPath = path.join(jobDir, `${sanitizedTitle}.mp4`);
 
     await ytDlpService.run([

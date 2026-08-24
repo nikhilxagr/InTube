@@ -12,7 +12,8 @@ export function useKeyboardShortcuts({
   onPasteUrl,
   onPrimaryAction,
   onEscape,
-  onToggleShortcuts
+  onToggleShortcuts,
+  onOpenCommandPalette
 } = {}) {
   const handleKeyDown = useCallback(
     async (e) => {
@@ -23,6 +24,15 @@ export function useKeyboardShortcuts({
         target instanceof HTMLInputElement ||
         target instanceof HTMLTextAreaElement ||
         target.isContentEditable;
+
+      // Ctrl/Cmd + K -> Open Command Palette
+      if (isModifier && (e.key === 'k' || e.key === 'K')) {
+        if (onOpenCommandPalette) {
+          e.preventDefault();
+          onOpenCommandPalette();
+        }
+        return;
+      }
 
       // Escape -> close dialogs / cancel
       if (e.key === 'Escape') {
@@ -66,7 +76,7 @@ export function useKeyboardShortcuts({
         }
       }
     },
-    [onPasteUrl, onPrimaryAction, onEscape, onToggleShortcuts]
+    [onPasteUrl, onPrimaryAction, onEscape, onToggleShortcuts, onOpenCommandPalette]
   );
 
   useEffect(() => {

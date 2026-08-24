@@ -1,4 +1,5 @@
 import { spawn } from 'child_process';
+import path from 'path';
 import ffmpegStatic from 'ffmpeg-static';
 import { config } from '../config/config.js';
 import { ProcessingFailedError, ProcessingTimeoutError } from '../utils/errors.js';
@@ -548,6 +549,80 @@ export class FFmpegService {
   async remux(inputPath, outputPath, options = {}) {
     const args = this.buildRemuxArgs(inputPath, outputPath);
     await this.execute(args, options);
+  }
+
+  /**
+   * Converts an audio file between formats (MP3, M4A, WAV, AAC, OGG).
+   * @param {string} inputPath
+   * @param {string} outputPath
+   * @param {object} [options={}]
+   * @returns {Promise<void>}
+   */
+  async convertAudio(inputPath, outputPath, options = {}) {
+    const format = (options.container || path.extname(outputPath).slice(1) || 'mp3').toLowerCase();
+    const bitrate = options.bitrate || '192k';
+
+    const args = ['-y', '-hide_banner', '-i', inputPath, '-vn'];
+
+    if (format === 'wav') {
+      args.push('-c:a', 'pcm_s16le');
+    } else if (format === 'm4a' || format === 'aac') {
+      args.push('-c:a', 'aac', '-b:a', bitrate);
+    } else if (format === 'ogg') {
+      args.push('-c:a', 'libvorbis', '-b:a', bitrate);
+    } else {
+      // Default MP3
+      args.push('-c:a', 'libmp3lame', '-b:a', bitrate);
+    }
+
+    args.push(outputPath);
+    await this.execute(args, options);
+  }
+
+  /**
+   * Extracts single frame or frame interval sequence from video.
+   * @param {string} inputPath
+   * @param {string} outputTarget - File path or output directory pattern
+   * @param {object} [options={}]
+   * @returns {Promise<void>}
+   */
+  async extractFrames(inputPath, outputTarget, options = {}) {
+    const { mode = 'first_frame', timestamp = '00:00:00.100', interval = 5, maxFrames = 30 } = options;
+
+    if (mode === 'first_frame') {
+      const args = [
+        '-y', '-hide_banner',
+        '-ss', '00:00:00.100',
+        '-i', inputPath,
+        '-vframes', '1',
+        '-q:v', '2',
+        outputTarget
+      ];
+      await this.execute(args, options);
+    } else if (mode === 'timestamp') {
+      const args = [
+        '-y', '-hide_banner',
+        '-ss', String(timestamp),
+        '-i', inputPath,
+        '-vframes', '1',
+        '-q:v', '2',
+        outputTarget
+      ];
+      await this.execute(args, options);
+    } else if (mode === 'interval') {
+      const safeInterval = Math.max(1, parseInt(interval, 10) || 5);
+      const safeMaxFrames = Math.max(1, Math.min(30, parseInt(maxFrames, 10) || 30));
+
+      const args = [
+        '-y', '-hide_banner',
+        '-i', inputPath,
+        '-vf', `fps=1/${safeInterval}`,
+        '-vframes', String(safeMaxFrames),
+        '-q:v', '2',
+        outputTarget
+      ];
+      await this.execute(args, options);
+    }
   }
 }
 

@@ -46,9 +46,11 @@ export function createApp() {
   // Global Rate Limiting
   app.use(globalRateLimiter);
 
-  // API Routes
+  // API Routes (versioned /api/v1 and alias /api)
   app.use('/api/v1', mediaRouter);
   app.use('/api/v1', toolsRouter);
+  app.use('/api', mediaRouter);
+  app.use('/api', toolsRouter);
 
   // 404 & Error Handlers
   app.use(notFoundMiddleware);

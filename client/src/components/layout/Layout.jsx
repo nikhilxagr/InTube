@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { Header } from '../common/Header.jsx';
 import { Footer } from '../common/Footer.jsx';
+import { DownloadQueueDrawer } from '../queue/DownloadQueueDrawer.jsx';
 
 export function Layout() {
   return (
@@ -13,6 +14,7 @@ export function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <DownloadQueueDrawer />
     </div>
   );
 }

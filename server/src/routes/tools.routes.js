@@ -5,7 +5,7 @@ import { analyzeRateLimiter, downloadRateLimiter } from '../middleware/rate-limi
 
 export const toolsRouter = Router();
 
-// Local Media Processing Endpoints
+// Local Media Inspection
 toolsRouter.post(
   '/tools/inspect',
   analyzeRateLimiter,
@@ -13,6 +13,7 @@ toolsRouter.post(
   (req, res, next) => toolsController.inspect(req, res, next)
 );
 
+// Video -> Audio Converter
 toolsRouter.post(
   '/tools/video-to-audio',
   downloadRateLimiter,
@@ -20,11 +21,59 @@ toolsRouter.post(
   (req, res, next) => toolsController.videoToAudio(req, res, next)
 );
 
+// Audio Converter (Audio to Audio)
+toolsRouter.post(
+  '/tools/audio-converter',
+  downloadRateLimiter,
+  handleFileUpload('file'),
+  (req, res, next) => toolsController.audioConverter(req, res, next)
+);
+
+// Video -> Image / Frames Extraction
+toolsRouter.post(
+  '/tools/video-to-image',
+  downloadRateLimiter,
+  handleFileUpload('file'),
+  (req, res, next) => toolsController.videoToImage(req, res, next)
+);
+
+// Image Converter
+toolsRouter.post(
+  '/tools/image/convert',
+  downloadRateLimiter,
+  handleFileUpload('file'),
+  (req, res, next) => toolsController.imageConvert(req, res, next)
+);
+
+// Image Compressor
+toolsRouter.post(
+  '/tools/image/compress',
+  downloadRateLimiter,
+  handleFileUpload('file'),
+  (req, res, next) => toolsController.imageCompress(req, res, next)
+);
+
+// Image Resizer
+toolsRouter.post(
+  '/tools/image/resize',
+  downloadRateLimiter,
+  handleFileUpload('file'),
+  (req, res, next) => toolsController.imageResize(req, res, next)
+);
+
+// Video Converter
 toolsRouter.post(
   '/tools/convert',
   downloadRateLimiter,
   handleFileUpload('file'),
   (req, res, next) => toolsController.convert(req, res, next)
+);
+
+// Batch URL Analyzer
+toolsRouter.post(
+  '/tools/batch/analyze',
+  analyzeRateLimiter,
+  (req, res, next) => toolsController.batchAnalyze(req, res, next)
 );
 
 // Thumbnail Downloader Endpoint

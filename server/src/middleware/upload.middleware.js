@@ -2,7 +2,8 @@ import multer from 'multer';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config/config.js';
-import { createJobDirectory, sanitizeFilename } from '../utils/file-utils.js';
+import { tempFileManager } from '../services/temp-file-manager.service.js';
+import { sanitizeFilename } from '../utils/file-utils.js';
 import { FileTooLargeError, UnsupportedFileError } from '../utils/errors.js';
 
 const ALLOWED_EXTENSIONS = new Set([
@@ -10,8 +11,8 @@ const ALLOWED_EXTENSIONS = new Set([
   '.mp4', '.m4v', '.webm', '.mov', '.mkv', '.avi', '.flv', '.wmv', '.3gp', '.ogv',
   // Audio
   '.mp3', '.m4a', '.aac', '.wav', '.ogg', '.flac', '.opus',
-  // Image (Metadata inspection)
-  '.jpg', '.jpeg', '.png', '.webp', '.gif'
+  // Image
+  '.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif'
 ]);
 
 const ALLOWED_MIME_PREFIXES = ['video/', 'audio/', 'image/'];
@@ -20,7 +21,7 @@ const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
       if (!req.jobDir) {
-        const { jobId, jobDir } = await createJobDirectory();
+        const { jobId, jobDir } = await tempFileManager.createJobDirectory('upload');
         req.jobId = jobId;
         req.jobDir = jobDir;
       }

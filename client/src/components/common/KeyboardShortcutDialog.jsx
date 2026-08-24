@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Keyboard, X, Sparkles } from 'lucide-react';
+import { Keyboard, X, Zap } from 'lucide-react';
 import { Card } from './Card.jsx';
 import { Button } from './Button.jsx';
 
@@ -119,9 +119,9 @@ export function KeyboardShortcutDialog({ isOpen, onClose }) {
         </div>
 
         <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400">
-          <span className="flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-purple-500" />
-            <span>Universal Media Toolkit Hotkeys</span>
+          <span className="flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
+            <span>Productivity Hotkeys</span>
           </span>
 
           <Button size="sm" variant="outline" onClick={onClose} className="text-xs">

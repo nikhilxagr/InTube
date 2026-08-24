@@ -11,234 +11,267 @@ import {
   Image as ImageIcon,
   Info,
   Smartphone,
-  Video,
-  Zap,
+  Layers,
+  TrendingDown,
+  Shield,
   ArrowRight,
-  Download
+  Download,
+  Sliders
 } from 'lucide-react';
 
 export function Tools() {
   const [filter, setFilter] = useState('all');
 
   const tools = [
-    // Converters
+    // Downloaders
     {
-      title: 'Video → Audio Converter',
+      title: 'Universal Downloader',
+      desc: 'Download videos, Reels, Shorts, and MP3 audio from YouTube, Instagram, and Facebook.',
+      path: ROUTES.HOME,
+      category: 'download',
+      categoryLabel: 'Download',
+      icon: Download,
+      badge: 'Multi-Engine',
+      variant: 'brand',
+      tag: 'Core'
+    },
+    {
+      title: 'Batch URL Downloader',
+      desc: 'Paste multiple links into a single queue. Process and download up to 5 items automatically.',
+      path: ROUTES.TOOLS_BATCH,
+      category: 'download',
+      categoryLabel: 'Download',
+      icon: Layers,
+      badge: 'Batch Queue',
+      variant: 'brand',
+      tag: 'New'
+    },
+
+    // Video Tools
+    {
+      title: 'Video Format Converter',
+      desc: 'Transcode local videos between MP4, WebM, and MOV with customizable quality presets.',
+      path: ROUTES.TOOLS_CONVERTER,
+      category: 'video',
+      categoryLabel: 'Video',
+      icon: Film,
+      badge: 'Fast Transcode',
+      variant: 'brand',
+      tag: 'Popular'
+    },
+    {
+      title: 'Video → Audio Extractor',
       desc: 'Extract studio-quality MP3, M4A, WAV, or OGG audio directly from your local video files.',
       path: ROUTES.TOOLS_VIDEO_TO_AUDIO,
-      category: 'converters',
-      categoryLabel: 'Converters',
+      category: 'video',
+      categoryLabel: 'Video',
       icon: Music,
-      badge: 'Local FFmpeg',
+      badge: 'High Bitrate',
+      variant: 'success',
+      tag: 'Popular'
+    },
+    {
+      title: 'Video → Image Frames',
+      desc: 'Extract first frame covers, specific timestamps, or frame interval sequences packaged into a ZIP.',
+      path: ROUTES.TOOLS_VIDEO_TO_IMAGE,
+      category: 'video',
+      categoryLabel: 'Video',
+      icon: ImageIcon,
+      badge: 'ZIP Support',
+      variant: 'brand',
+      tag: 'New'
+    },
+
+    // Audio Tools
+    {
+      title: 'Audio Converter',
+      desc: 'Convert audio files between MP3, M4A, WAV (lossless PCM), AAC, and OGG formats.',
+      path: ROUTES.TOOLS_AUDIO_CONVERTER,
+      category: 'audio',
+      categoryLabel: 'Audio',
+      icon: Music,
+      badge: 'Studio Bitrates',
+      variant: 'success',
+      tag: 'New'
+    },
+
+    // Image Tools
+    {
+      title: 'Image Converter',
+      desc: 'Convert photos and graphics between JPG, PNG, modern WebP, and ultra-compact AVIF.',
+      path: ROUTES.TOOLS_IMAGE_CONVERT,
+      category: 'image',
+      categoryLabel: 'Image',
+      icon: ImageIcon,
+      badge: 'Next-Gen AVIF',
+      variant: 'brand',
+      tag: 'New'
+    },
+    {
+      title: 'Image Compressor',
+      desc: 'Reduce photo file sizes by up to 75% with instant before/after reduction metrics.',
+      path: ROUTES.TOOLS_IMAGE_COMPRESS,
+      category: 'image',
+      categoryLabel: 'Image',
+      icon: TrendingDown,
+      badge: 'Sharp Engine',
       variant: 'success',
       tag: 'New'
     },
     {
-      title: 'Video Format Converter',
-      desc: 'Convert local videos between MP4, WebM, and MOV with customizable encoding presets.',
-      path: ROUTES.TOOLS_CONVERTER,
-      category: 'converters',
-      categoryLabel: 'Converters',
-      icon: Film,
-      badge: 'Fast Transcode',
+      title: 'Image Resizer',
+      desc: 'Resize pixel dimensions while strictly maintaining original aspect ratio with zero default upscaling.',
+      path: ROUTES.TOOLS_IMAGE_RESIZE,
+      category: 'image',
+      categoryLabel: 'Image',
+      icon: Sliders,
+      badge: 'HD Presets',
       variant: 'brand',
       tag: 'New'
     },
-    // Media Utilities
     {
-      title: 'HD Thumbnail Downloader',
-      desc: 'Retrieve and save the highest-resolution official cover images from YouTube, Instagram, and Facebook.',
+      title: 'HD Thumbnail Extractor',
+      desc: 'Download maximum resolution official cover art from YouTube, Instagram, and Facebook.',
       path: ROUTES.TOOLS_THUMBNAIL,
-      category: 'utilities',
-      categoryLabel: 'Utilities',
+      category: 'image',
+      categoryLabel: 'Image',
       icon: ImageIcon,
-      badge: 'Official Covers',
+      badge: 'Original HD',
       variant: 'youtube',
-      tag: 'New'
+      tag: 'Utility'
+    },
+
+    // Utilities & Privacy
+    {
+      title: 'QR Mobile Transfer',
+      desc: 'Beam converted media or downloads directly to your phone via single-use 10-minute QR code.',
+      path: ROUTES.TOOLS_QR_TRANSFER,
+      category: 'utility',
+      categoryLabel: 'Utility',
+      icon: Smartphone,
+      badge: 'Stateless Token',
+      variant: 'success',
+      tag: 'Popular'
     },
     {
       title: 'Media Metadata Inspector',
-      desc: 'Inspect codecs, resolution, bitrate, fps, and stream specifications from local audio and video files.',
+      desc: 'Analyze video and audio streams for duration, codecs, frame rates, sample rates, and bitrates.',
       path: ROUTES.TOOLS_METADATA,
-      category: 'utilities',
-      categoryLabel: 'Utilities',
+      category: 'utility',
+      categoryLabel: 'Utility',
       icon: Info,
-      badge: 'Deep Inspection',
-      variant: 'secondary',
-      tag: 'New'
-    },
-    // Transfer
-    {
-      title: 'QR Mobile Transfer',
-      desc: 'Wirelessly beam converted files and downloads directly to your smartphone with temporary QR codes.',
-      path: ROUTES.TOOLS_QR_TRANSFER,
-      category: 'transfer',
-      categoryLabel: 'Transfer',
-      icon: Smartphone,
-      badge: 'Zero Cable',
-      variant: 'secondary',
-      tag: 'New'
-    },
-    // Downloaders
-    {
-      title: 'Universal URL Downloader',
-      desc: 'Analyze and download video and audio from public YouTube, Instagram, and Facebook links.',
-      path: ROUTES.HOME,
-      category: 'downloaders',
-      categoryLabel: 'Downloaders',
-      icon: Download,
-      badge: 'Universal',
-      variant: 'brand'
+      badge: 'FFprobe Info',
+      variant: 'brand',
+      tag: 'Developer'
     },
     {
-      title: 'YouTube Video Downloader',
-      desc: 'Download 1080p, 720p, and 480p videos with audio from public YouTube links.',
-      path: ROUTES.YOUTUBE_VIDEO,
-      category: 'downloaders',
-      categoryLabel: 'Downloaders',
-      icon: Video,
-      badge: 'YouTube',
-      variant: 'youtube'
-    },
-    {
-      title: 'YouTube Shorts Downloader',
-      desc: 'Save viral and vertical short-form videos directly in MP4 format.',
-      path: ROUTES.YOUTUBE_SHORTS,
-      category: 'downloaders',
-      categoryLabel: 'Downloaders',
-      icon: Zap,
-      badge: 'Shorts',
-      variant: 'youtube'
-    },
-    {
-      title: 'YouTube to MP3',
-      desc: 'Extract clean audio tracks and convert public videos to 320kbps MP3 or M4A.',
-      path: ROUTES.YOUTUBE_MP3,
-      category: 'downloaders',
-      categoryLabel: 'Downloaders',
-      icon: Music,
-      badge: 'Audio',
-      variant: 'success'
-    },
-    {
-      title: 'Instagram Reels Downloader',
-      desc: 'Download public Instagram Reels with original high-definition video and audio.',
-      path: ROUTES.INSTAGRAM_REELS,
-      category: 'downloaders',
-      categoryLabel: 'Downloaders',
-      icon: Film,
-      badge: 'Instagram',
-      variant: 'instagram'
-    },
-    {
-      title: 'Instagram Stories & Posts',
-      desc: 'Extract photo carousels, single photos, and video posts from public profiles.',
-      path: ROUTES.INSTAGRAM_POSTS,
-      category: 'downloaders',
-      categoryLabel: 'Downloaders',
-      icon: ImageIcon,
-      badge: 'Instagram',
-      variant: 'instagram'
-    },
-    {
-      title: 'Facebook Video Downloader',
-      desc: 'Save public Facebook reels and videos in HD and SD MP4 formats.',
-      path: ROUTES.FACEBOOK,
-      category: 'downloaders',
-      categoryLabel: 'Downloaders',
-      icon: Video,
-      badge: 'Facebook',
-      variant: 'facebook'
+      title: 'Privacy Dashboard',
+      desc: 'Explore our zero-database, zero-account, ephemeral processing architecture and cleanup guarantees.',
+      path: ROUTES.PRIVACY,
+      category: 'privacy',
+      categoryLabel: 'Privacy',
+      icon: Shield,
+      badge: 'Stateless',
+      variant: 'success',
+      tag: 'Transparent'
     }
   ];
 
   const categories = [
-    { id: 'all', label: 'All Media Tools' },
-    { id: 'converters', label: 'Converters' },
-    { id: 'utilities', label: 'Media Utilities' },
-    { id: 'transfer', label: 'QR Transfer' },
-    { id: 'downloaders', label: 'URL Downloaders' }
+    { key: 'all', label: 'All Tools' },
+    { key: 'download', label: 'Downloaders' },
+    { key: 'video', label: 'Video' },
+    { key: 'audio', label: 'Audio' },
+    { key: 'image', label: 'Image' },
+    { key: 'utility', label: 'Utilities' },
+    { key: 'privacy', label: 'Privacy' }
   ];
 
-  const filteredTools = filter === 'all'
-    ? tools
-    : tools.filter((t) => t.category === filter);
+  const filteredTools = filter === 'all' ? tools : tools.filter((t) => t.category === filter);
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto">
+    <div className="space-y-8 max-w-6xl mx-auto">
       <SEO
-        title="Universal Media Toolbox - All Converters, Extractors & Utilities"
-        description="Comprehensive media toolbox: Video to Audio, Video Format Converter, HD Thumbnail Downloader, Metadata Inspector, and QR Transfer."
+        title="Media Toolbox — InTube Universal Media Utilities"
+        description="Comprehensive collection of video, audio, image converters, batch downloaders, frame extractors, and privacy tools."
       />
 
       {/* Header */}
-      <div className="text-center space-y-3.5">
-        <div className="inline-flex p-3 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 shadow-md">
-          <Wrench className="w-7 h-7" />
+      <div className="text-center space-y-3">
+        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 text-white shadow-xl shadow-blue-500/20">
+          <Wrench className="w-8 h-8" />
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
           Universal Media Toolbox
         </h1>
-        <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          High-performance media utilities for downloading, converting, inspecting, and transferring video and audio streams seamlessly.
+        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+          Fast, stateless video transcoding, audio conversion, image optimization, batch queuing, and mobile transfer tools.
         </p>
       </div>
 
-      {/* Category Tabs */}
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        {categories.map((cat) => (
+      {/* Filter Tabs */}
+      <div className="flex items-center justify-center flex-wrap gap-2">
+        {categories.map((c) => (
           <button
-            key={cat.id}
+            key={c.key}
             type="button"
-            onClick={() => setFilter(cat.id)}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
-              filter === cat.id
-                ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20'
-                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
+            onClick={() => setFilter(c.key)}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              filter === c.key
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 scale-105'
+                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
             }`}
           >
-            {cat.label}
+            {c.label}
           </button>
         ))}
       </div>
 
       {/* Tools Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredTools.map((tool) => (
-          <Link key={tool.path + tool.title} to={tool.path} className="focus:outline-none flex">
-            <Card className="p-6 hover:border-purple-500/50 hover:shadow-2xl transition-all h-full flex flex-col justify-between group w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl">
-              <div className="space-y-3.5">
+        {filteredTools.map((t) => {
+          const Icon = t.icon;
+          return (
+            <Card
+              key={t.title}
+              className="p-6 border border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl flex flex-col justify-between group hover:border-blue-500/50 dark:hover:border-blue-500/50 transition-all duration-200"
+            >
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 group-hover:bg-purple-50 dark:group-hover:bg-purple-950/60 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors shadow-sm">
-                    <tool.icon className="w-5 h-5" />
+                  <div className="w-11 h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Icon className="w-5 h-5" />
                   </div>
                   <div className="flex items-center gap-1.5">
-                    {tool.tag && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-pink-500/10 text-pink-600 dark:text-pink-400 border border-pink-500/20">
-                        {tool.tag}
-                      </span>
-                    )}
-                    <Badge size="sm" variant={tool.variant}>
-                      {tool.badge}
+                    <Badge variant={t.variant} size="sm">
+                      {t.badge}
                     </Badge>
                   </div>
                 </div>
 
-                <h2 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                  {tool.title}
-                </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  {tool.desc}
-                </p>
+                <div>
+                  <h3 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {t.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed line-clamp-3">
+                    {t.desc}
+                  </p>
+                </div>
               </div>
 
-              <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-slate-800/80 text-xs font-bold text-purple-600 dark:text-purple-400 flex items-center justify-between">
-                <span>Open Tool</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              <div className="pt-6">
+                <Link to={t.path}>
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all group/btn"
+                  >
+                    <span>Launch Tool</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                  </button>
+                </Link>
               </div>
             </Card>
-          </Link>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
