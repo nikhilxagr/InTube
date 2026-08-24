@@ -40,7 +40,7 @@ export class FacebookProvider extends ProviderInterface {
         id: info.id || String(Date.now()),
         url: videoUrl,
         type: 'video',
-        title: info.title || info.description?.slice(0, 120) || 'Facebook Video',
+        title: info.description?.trim() || info.title?.trim() || 'Facebook Video',
         author: info.uploader || info.channel || info.uploader_id || '',
         duration: info.duration || null,
         thumbnail,

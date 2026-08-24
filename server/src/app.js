@@ -6,6 +6,7 @@ import { globalRateLimiter } from './middleware/rate-limit.middleware.js';
 import { notFoundMiddleware } from './middleware/not-found.middleware.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
 import { mediaRouter } from './routes/media.routes.js';
+import { toolsRouter } from './routes/tools.routes.js';
 import { logger } from './utils/logger.js';
 
 export function createApp() {
@@ -47,6 +48,7 @@ export function createApp() {
 
   // API Routes
   app.use('/api/v1', mediaRouter);
+  app.use('/api/v1', toolsRouter);
 
   // 404 & Error Handlers
   app.use(notFoundMiddleware);

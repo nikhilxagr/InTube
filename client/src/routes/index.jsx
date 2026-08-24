@@ -2,7 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout.jsx';
 import { ROUTES } from '../constants/routes.js';
 
-// Pages
+// General Pages
 import { Home } from '../pages/Home.jsx';
 import { Instagram } from '../pages/Instagram.jsx';
 import { Reels } from '../pages/Reels.jsx';
@@ -20,6 +20,16 @@ import { About } from '../pages/About.jsx';
 import { Privacy } from '../pages/Privacy.jsx';
 import { Terms } from '../pages/Terms.jsx';
 
+// Media Tools Pages
+import { VideoToAudio } from '../pages/tools/VideoToAudio.jsx';
+import { VideoConverter } from '../pages/tools/VideoConverter.jsx';
+import { ThumbnailDownloader } from '../pages/tools/ThumbnailDownloader.jsx';
+import { MetadataTool } from '../pages/tools/MetadataTool.jsx';
+import { QrTransferPage } from '../pages/tools/QrTransferPage.jsx';
+
+// Standalone Mobile Transfer Page
+import { TransferPage } from '../pages/TransferPage.jsx';
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -36,12 +46,25 @@ export const router = createBrowserRouter([
       { path: ROUTES.YOUTUBE_SHORTS, element: <YouTubeShorts /> },
       { path: ROUTES.YOUTUBE_MP3, element: <YouTubeMP3 /> },
       { path: ROUTES.TOOLS, element: <Tools /> },
+      { path: ROUTES.TOOLS_VIDEO_TO_AUDIO, element: <VideoToAudio /> },
+      { path: ROUTES.TOOLS_CONVERTER, element: <VideoConverter /> },
+      { path: ROUTES.TOOLS_THUMBNAIL, element: <ThumbnailDownloader /> },
+      { path: ROUTES.TOOLS_METADATA, element: <MetadataTool /> },
+      { path: ROUTES.TOOLS_QR_TRANSFER, element: <QrTransferPage /> },
       { path: ROUTES.HOW_IT_WORKS, element: <HowItWorks /> },
       { path: ROUTES.FAQ, element: <FAQ /> },
       { path: ROUTES.ABOUT, element: <About /> },
       { path: ROUTES.PRIVACY, element: <Privacy /> },
-      { path: ROUTES.TERMS, element: <Terms /> },
-      { path: '*', element: <Navigate to="/" replace /> }
+      { path: ROUTES.TERMS, element: <Terms /> }
     ]
+  },
+  // Mobile QR direct transfer page (standalone lightweight layout)
+  {
+    path: ROUTES.TRANSFER,
+    element: <TransferPage />
+  },
+  {
+    path: '*',
+    element: <Navigate to="/" replace />
   }
 ]);

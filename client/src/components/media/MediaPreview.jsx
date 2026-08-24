@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Clock, User, Download, RefreshCw, Layers, Sparkles, Gauge, Hourglass, Film, Zap, Play, Image as ImageIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Clock, User, Download, RefreshCw, Layers, Gauge, Hourglass, Film, Zap, Play, Smartphone } from 'lucide-react';
 import { Card } from '../common/Card.jsx';
 import { Button } from '../common/Button.jsx';
 import { Badge } from '../common/Badge.jsx';
 import { FormatSelector } from './FormatSelector.jsx';
+import { QrTransferCard } from '../tools/QrTransferCard.jsx';
 
 export function MediaPreview({
   media,
@@ -16,6 +17,14 @@ export function MediaPreview({
   countdown = null
 }) {
   const [imgError, setImgError] = useState(false);
+  const [showFullCaption, setShowFullCaption] = useState(false);
+  const [showQr, setShowQr] = useState(false);
+
+  useEffect(() => {
+    setImgError(false);
+    setShowFullCaption(false);
+    setShowQr(false);
+  }, [media?.url, media?.thumbnail, media?.id]);
 
   if (!media) return null;
 
@@ -129,9 +138,22 @@ export function MediaPreview({
             </span>
           </div>
 
-          <h3 className="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white leading-snug break-words">
-            {media.title || 'Untitled Media'}
-          </h3>
+          <div className="space-y-1">
+            <h3 className="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white leading-snug break-words">
+              {showFullCaption || (media.title && media.title.length <= 140)
+                ? (media.title || 'Untitled Media')
+                : `${media.title?.slice(0, 140)}...`}
+            </h3>
+            {media.title && media.title.length > 140 && (
+              <button
+                type="button"
+                onClick={() => setShowFullCaption(!showFullCaption)}
+                className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline inline-block"
+              >
+                {showFullCaption ? 'Show less' : 'Read full caption'}
+              </button>
+            )}
+          </div>
 
           <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400 pt-1">
             {media.author && (
@@ -308,22 +330,54 @@ export function MediaPreview({
           Clear & Analyze Another URL
         </Button>
 
-        <Button
-          size="md"
-          variant="primary"
-          disabled={!selectedFormat || isDownloading}
-          isLoading={isDownloading}
-          onClick={handleDownloadClick}
-          className="font-bold shadow-lg shadow-purple-600/30"
-        >
-          <Download className="w-4 h-4 mr-2" />
-          {isDownloading
-            ? (countdown !== null
-                ? `Starting in ${countdown}s...`
-                : (percent !== null ? `Downloading (${Math.round(percent)}%)...` : 'Processing...'))
-            : `Download ${selectedFormat ? `(${selectedFormat.quality || selectedFormat.container?.toUpperCase()})` : ''}`}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="md"
+            variant="outline"
+            disabled={!selectedFormat || isDownloading}
+            onClick={() => setShowQr(true)}
+            className="text-xs font-bold"
+            title="Scan with phone camera to transfer"
+          >
+            <Smartphone className="w-4 h-4 mr-1.5 text-purple-500" />
+            Transfer to Phone
+          </Button>
+
+          <Button
+            size="md"
+            variant="primary"
+            disabled={!selectedFormat || isDownloading}
+            isLoading={isDownloading}
+            onClick={handleDownloadClick}
+            className="font-bold shadow-lg shadow-purple-600/30"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            {isDownloading
+              ? (countdown !== null
+                  ? `Starting in ${countdown}s...`
+                  : (percent !== null ? `Downloading (${Math.round(percent)}%)...` : 'Processing...'))
+              : `Download ${selectedFormat ? `(${selectedFormat.quality || selectedFormat.container?.toUpperCase()})` : ''}`}
+          </Button>
+        </div>
       </div>
+
+      {showQr && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="QR Transfer Modal"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn"
+        >
+          <div className="fixed inset-0" onClick={() => setShowQr(false)} />
+          <div className="relative z-10 w-full max-w-md">
+            <QrTransferCard
+              token="phone_qr_transfer"
+              filename={media.title || 'media_video.mp4'}
+              onClose={() => setShowQr(false)}
+            />
+          </div>
+        </div>
+      )}
     </Card>
   );
 }

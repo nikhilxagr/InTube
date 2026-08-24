@@ -10,6 +10,11 @@ export const ErrorCodes = {
   PROCESSING_TIMEOUT: 'PROCESSING_TIMEOUT',
   RATE_LIMITED: 'RATE_LIMITED',
   NOT_FOUND: 'NOT_FOUND',
+  INVALID_MEDIA_FILE: 'INVALID_MEDIA_FILE',
+  UNSUPPORTED_FILE: 'UNSUPPORTED_FILE',
+  THUMBNAIL_UNAVAILABLE: 'THUMBNAIL_UNAVAILABLE',
+  TRANSFER_EXPIRED: 'TRANSFER_EXPIRED',
+  TRANSFER_NOT_FOUND: 'TRANSFER_NOT_FOUND',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR'
 };
 
@@ -97,3 +102,34 @@ export class NotFoundError extends AppError {
     super(ErrorCodes.NOT_FOUND, message, 404);
   }
 }
+
+export class InvalidMediaFileError extends AppError {
+  constructor(message = 'The uploaded file is not a valid or recognizable media file.') {
+    super(ErrorCodes.INVALID_MEDIA_FILE, message, 400);
+  }
+}
+
+export class UnsupportedFileError extends AppError {
+  constructor(message = 'Unsupported file format or MIME type.') {
+    super(ErrorCodes.UNSUPPORTED_FILE, message, 400);
+  }
+}
+
+export class ThumbnailUnavailableError extends AppError {
+  constructor(message = 'Thumbnail unavailable for this media.') {
+    super(ErrorCodes.THUMBNAIL_UNAVAILABLE, message, 404);
+  }
+}
+
+export class TransferExpiredError extends AppError {
+  constructor(message = 'This transfer has expired. Please generate a new QR code.') {
+    super(ErrorCodes.TRANSFER_EXPIRED, message, 410);
+  }
+}
+
+export class TransferNotFoundError extends AppError {
+  constructor(message = 'Transfer record not found or already consumed.') {
+    super(ErrorCodes.TRANSFER_NOT_FOUND, message, 404);
+  }
+}
+

@@ -1,19 +1,58 @@
-# InTube — Modern Media Utility & Downloader
+# InTube — Universal Media Toolkit
 
-A fast, compliant, and privacy-focused media utility web application. InTube allows users to analyze public media URLs and extract authorized streams into standard video and audio formats without requiring user accounts, databases, or permanent storage.
+A fast, compliant, and privacy-focused universal media utility web application. InTube provides a comprehensive suite of media processing tools — URL downloading, video-to-audio extraction, container format transcoding, official thumbnail extraction, technical metadata inspection, and zero-cable QR mobile transfers — without requiring accounts, databases, or permanent media storage.
 
 ---
 
-## 🌟 Key Features
+## 🌟 Universal Media Suite
 
-- **Zero-Account Stateless Architecture**: No login, no database, no persistent history, and no user tracking.
-- **Vercel & Render Ready**: Optimized for serverless frontend (Vercel) and low-memory native Linux backend (Render).
-- **Compliant Public Media Access**: Public metadata inspection for YouTube and Instagram without DRM circumvention, session hijacking, or private access tampering.
-- **Authentic Metadata & Formats**: Displays genuine resolutions and bitrates available from public media sources.
-- **Memory-Safe Streaming**: Direct read-stream piping between disk and HTTP response sockets; zero multi-megabyte RAM buffering.
-- **Guaranteed Ephemeral Cleanup**: Automatic deletion of isolated UUID job folders on stream finish, client disconnect, process error, or garbage sweep.
-- **Defense-in-Depth Security**: Multi-representation SSRF protection, command injection prevention (`shell: false`), path traversal containment, Windows reserved device name guards, and multi-tier rate limiting.
-- **Modern UI/UX**: 15 accessible SPA routes with dark/light mode, responsive cards, format selectors, and live health telemetry.
+### 1. 🔗 Universal URL Downloader
+- **YouTube**: 1080p, 720p, 480p MP4 videos, Shorts, and 320kbps MP3 audio.
+- **Instagram**: Public Reels, photo albums, carousels, stories, and video posts.
+- **Facebook**: HD and SD public videos and Reels.
+- **Live Stream / Dual-Engine Fallback**: Native JavaScript Innertube engine + high-performance yt-dlp backend.
+
+### 2. 🎵 Video → Audio Converter (`/tools/video-to-audio`)
+- Upload local video files (MP4, WebM, MOV, MKV, AVI) and extract studio-quality audio.
+- Supported output formats: **MP3**, **M4A / AAC**, **WAV** (lossless PCM), and **OGG**.
+- Selectable bitrates: 128 kbps, 192 kbps, 256 kbps, 320 kbps.
+
+### 3. 🎬 Video Format Converter (`/tools/converter`)
+- Transcode local video files to standard **MP4**, **WebM**, or **MOV**.
+- Presets: Balanced (Fast 1080p CRF 22), High Quality (CRF 18), Small File (CRF 28).
+- Streamable faststart container normalization.
+
+### 4. 🖼️ HD Thumbnail Downloader (`/tools/thumbnail`)
+- Extract official highest-resolution covers from YouTube, Instagram, and Facebook.
+- Instant single-click downloads in **JPG** or **PNG** format.
+
+### 5. 🔍 Media Metadata Inspector (`/tools/metadata`)
+- Deep technical spec inspection with FFmpeg / ffprobe.
+- Inspects codecs, frame rate, sample rate, channels, bitrate, dimensions, and duration.
+- One-click `Copy JSON` for developers and creators.
+
+### 6. 📱 QR Mobile Direct Transfer (`/tools/qr-transfer` & `/transfer/:token`)
+- Beam processed downloads or audio conversions directly from PC to mobile phone.
+- Single-use, cryptographically secure 64-character token with live 10-minute expiration timer.
+- Ultra-clean mobile landing page with zero ads, zero tracking, and zero login required.
+
+### 7. ⚡ Keyboard Shortcut Workflow & Smart Dropzone
+- `Ctrl/Cmd + V`: Auto-populate media URL from clipboard into downloader.
+- `Enter`: Instant analyze on focused input.
+- `Ctrl/Cmd + Enter`: Trigger primary action (Analyze / Download / Convert).
+- `Escape`: Clear active alerts, modals, or error notices.
+- `?`: Open keyboard shortcuts helper modal.
+- Smart Dropzone: Automatically detects local media files dropped into the URL bar and offers quick converter tools.
+
+---
+
+## 🔒 Privacy & Security Model
+
+- **Zero Accounts & Zero Tracking**: No logins, passwords, emails, cookies, or user databases.
+- **Stateless & Ephemeral**: Media files reside strictly inside isolated UUID temp folders and are purged immediately upon download completion, connection abort, or expiration.
+- **Cryptographic QR Tokens**: Unguessable 256-bit random tokens (`crypto.randomBytes(32).toString('hex')`) with automatic garbage collection after 10 minutes.
+- **Strict Compliance**: No DRM circumvention, no session scraping, and no private access bypass. Only processes authorized, public media.
+- **Defense in Depth**: Multi-representation SSRF validation, discrete argument execution (`shell: false`), path traversal containment guards, and multi-tier rate limiting.
 
 ---
 
@@ -21,7 +60,7 @@ A fast, compliant, and privacy-focused media utility web application. InTube all
 
 ### 1. Prerequisites
 - **Node.js**: `v18.0.0+` (Recommended `v20.x` or `v22.x` LTS)
-- **FFmpeg**: (Optional for local media transcoding; native on Render Linux)
+- **FFmpeg**: Bundled via `ffmpeg-static` for zero-setup execution.
 
 ### 2. Installation
 ```bash
@@ -29,15 +68,18 @@ A fast, compliant, and privacy-focused media utility web application. InTube all
 git clone https://github.com/nikhilxagr/InTube.git
 cd InTube
 
-# Install all dependencies (root, server, and client)
-npm install
-npm run install:all
+# Install all dependencies (server and client)
+npm install --prefix server
+npm install --prefix client
 ```
 
 ### 3. Run Development Server
 ```bash
-# Run both client (5173) and server (5000) concurrently
-npm run dev
+# Terminal 1 - Backend Server (Port 5000)
+npm run dev --prefix server
+
+# Terminal 2 - Frontend Client (Port 5173)
+npm run dev --prefix client
 ```
 
 - **Frontend**: [http://localhost:5173](http://localhost:5173)
@@ -48,76 +90,75 @@ npm run dev
 
 ## 🧪 Testing & Verification
 
-InTube uses Node.js's native test runner (`node:test`) for fast, zero-dependency testing.
-
 ```bash
-# Run all 83 automated tests across 25 suites
-npm test
+# Run server test suite
+npm test --prefix server
 
-# Run workspace ESLint
-npm run lint
+# Run client and server linters
+npm run lint --prefix client
+npm run lint --prefix server
 
-# Build client production bundle
-npm run build:client
+# Production build verification
+npm run build --prefix client
 ```
 
 ---
 
-## 🚢 Deployment (Vercel + Render)
+## 📡 API Endpoints
 
-| Component | Target Platform | Build Command | Output / Start |
-| :--- | :--- | :--- | :--- |
-| **Frontend** | [Vercel](https://vercel.com) | `npm run build` (in `client/`) | `dist` |
-| **Backend** | [Render](https://render.com) | `npm install --prefix server` | `npm start --prefix server` |
-
-For full deployment documentation, environment variables, and free-tier optimization details, see [docs/deployment.md](docs/deployment.md).
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/health` | Service health telemetry, memory stats & uptime |
+| `POST` | `/api/v1/media/analyze` | Analyzes public media URL metadata |
+| `POST` | `/api/v1/media/job` | Initiates background download job with progress tracking |
+| `GET` | `/api/v1/media/job/:jobId/progress` | Polls active download percentage, speed, and ETA |
+| `GET` | `/api/v1/media/job/:jobId/file` | Streams completed media binary with cleanup |
+| `POST` | `/api/v1/tools/inspect` | Multipart upload for technical metadata inspection |
+| `POST` | `/api/v1/tools/video-to-audio` | Converts uploaded video to MP3, M4A, WAV, AAC, or OGG |
+| `POST` | `/api/v1/tools/convert` | Converts uploaded video to MP4, WebM, or MOV |
+| `POST` | `/api/v1/tools/thumbnail` | Retrieves authentic HD cover image URL |
+| `POST` | `/api/v1/transfer/create` | Registers an ephemeral QR transfer token |
+| `GET` | `/api/v1/transfer/:token` | Retrieves transfer metadata for mobile phone landing |
+| `GET` | `/api/v1/transfer/:token/download` | Streams file to mobile device |
 
 ---
 
-## 📂 Project Structure
+## ⚙️ Environment Variables
 
+### Backend (`server/.env`)
+```env
+PORT=5000
+HOST=0.0.0.0
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
+ALLOWED_ORIGINS=http://localhost:5173,https://intubedl.vercel.app
+MAX_FILE_SIZE_MB=100
+MAX_UPLOAD_SIZE_MB=50
+MAX_PROCESSING_TIME_MS=120000
+TRANSFER_EXPIRATION_SECONDS=600
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+DOWNLOAD_RATE_LIMIT_MAX=20
 ```
-InTube/
-├── client/                     # React 18 + Vite + Tailwind CSS Frontend
-│   ├── public/                 # Static assets
-│   ├── src/
-│   │   ├── components/         # Downloader, MediaPreview, FormatSelector, UI primitives
-│   │   ├── pages/              # 15 accessible SPA pages
-│   │   ├── services/           # Axios API client & MediaService
-│   │   └── context/            # Theme context (Dark/Light)
-│   └── vercel.json             # Vercel SPA rewrite configuration
-│
-├── server/                     # Express.js API & FFmpeg Streaming Backend
-│   ├── src/
-│   │   ├── config/             # Zod environment schema & limits
-│   │   ├── controllers/        # MediaController & HealthController
-│   │   ├── services/           # MediaService, FFmpegService, CleanupService
-│   │   ├── providers/          # YouTube & Instagram compliant providers
-│   │   ├── middleware/         # Rate limiting, Security headers, Request ID, Errors
-│   │   └── utils/              # SSRF URL validator, Logger, File utils, Error classes
-│   └── test/                   # Comprehensive Node.js native test suite
-│
-├── docs/                       # Architectural & operational documentation
-│   ├── api.md                  # REST API specifications
-│   ├── deployment.md           # Step-by-step Vercel & Render guide
-│   ├── development.md          # Local developer workflows
-│   ├── architecture.md         # Architecture blueprint
-│   └── security.md             # Threat model & security hardening
-│
-├── render.yaml                 # Render Blueprint specification
-└── package.json                # Root monorepo orchestration
+
+### Frontend (`client/.env`)
+```env
+VITE_API_BASE_URL=https://intube-backend-lj8g.onrender.com/api/v1
 ```
 
 ---
 
-## 📖 Detailed Documentation
-- [Architecture & Design](docs/architecture.md)
-- [API Specifications](docs/api.md)
-- [Deployment Guide (Vercel + Render)](docs/deployment.md)
-- [Security & SSRF Architecture](docs/security.md)
-- [Local Development Guide](docs/development.md)
+## ☁️ Deployment
+
+- **Frontend Target**: Vercel (`https://intubedl.vercel.app/`)
+- **Backend Target**: Render Linux Web Service (`https://intube-backend-lj8g.onrender.com`)
+
+### Render / Vercel Architecture Notes
+- Render free tier instances operate on an ephemeral filesystem with 512MB RAM.
+- All temporary files and QR transfers are cleaned up aggressively to ensure lightweight memory and disk footprints.
 
 ---
 
-## ⚖️ Legal & Compliance
-This software is intended solely for public media and content that the user owns or is authorized to process and download. It does not bypass DRM, paywalls, private access controls, or platform authentication mechanisms.
+## 📄 License
+
+MIT © Nikhil Projects

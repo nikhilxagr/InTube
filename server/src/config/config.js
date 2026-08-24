@@ -18,9 +18,11 @@ const configSchema = z.object({
 
   // Limits
   MAX_FILE_SIZE_MB: z.coerce.number().default(100),
+  MAX_UPLOAD_SIZE_MB: z.coerce.number().default(50),
   MAX_PROCESSING_TIME_MS: z.coerce.number().default(120000),
   MAX_TEMP_STORAGE_MB: z.coerce.number().default(1024),
   MAX_CONCURRENT_JOBS: z.coerce.number().default(5),
+  TRANSFER_EXPIRATION_SECONDS: z.coerce.number().default(600),
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(15 * 60 * 1000),
@@ -49,6 +51,7 @@ export const config = {
   isDevelopment: parsed.data.NODE_ENV === 'development',
   isTest: parsed.data.NODE_ENV === 'test',
   MAX_FILE_SIZE_BYTES: parsed.data.MAX_FILE_SIZE_MB * 1024 * 1024,
+  MAX_UPLOAD_SIZE_BYTES: parsed.data.MAX_UPLOAD_SIZE_MB * 1024 * 1024,
   resolvedTempDir: path.isAbsolute(parsed.data.TEMP_DIR)
     ? parsed.data.TEMP_DIR
     : path.resolve(__dirname, '../../', parsed.data.TEMP_DIR)

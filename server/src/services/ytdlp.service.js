@@ -62,7 +62,7 @@ export class YtDlpService {
         env: { ...process.env }
       });
 
-      const progressRegex = /\[download\]\s+([\d\.]+)%\s+of\s+~?\s*([\d\.]+[A-Za-z]+)\s+at\s+([^\s]+)(?:\s+ETA\s+([^\s]+))?/;
+      const progressRegex = /\[download\]\s+([\d.]+)%\s+of\s+~?\s*([\d.]+[A-Za-z]+)\s+at\s+([^\s]+)(?:\s+ETA\s+([^\s]+))?/;
       const mergerRegex = /\[(?:Merger|FixupM3u8|ffmpeg)\]/i;
       const audioExtractRegex = /\[ExtractAudio\]/i;
 
@@ -111,7 +111,11 @@ export class YtDlpService {
       const timer = setTimeout(() => {
         if (!settled) {
           settled = true;
-          try { proc.kill('SIGKILL'); } catch {}
+          try {
+            proc.kill('SIGKILL');
+          } catch {
+            // Process may have already exited
+          }
           reject(new ProcessingTimeoutError(`yt-dlp operation exceeded ${timeoutMs}ms timeout.`));
         }
       }, timeoutMs);
@@ -217,7 +221,7 @@ export class YtDlpService {
     });
   }
 
-  spawnStream(url, formatSpec, opts = {}) {
+  spawnStream(url, formatSpec, _opts = {}) {
     const args = [
       ...this.getBaseArgs(),
       '-f', formatSpec,

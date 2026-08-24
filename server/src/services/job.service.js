@@ -5,7 +5,7 @@ import { cleanupService } from './cleanup.service.js';
 class JobService {
   constructor() {
     this.jobs = new Map();
-    setInterval(() => this.cleanupStaleJobs(), 60000);
+    this.sweepInterval = globalThis.setInterval(() => this.cleanupStaleJobs(), 60000);
   }
 
   createJob(metadata = {}) {

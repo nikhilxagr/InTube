@@ -6,8 +6,7 @@ import { ytDlpService } from '../../services/ytdlp.service.js';
 import {
   AuthorizationRequiredError,
   MediaUnavailableError,
-  ProviderUnavailableError,
-  UnsupportedMediaError
+  ProviderUnavailableError
 } from '../../utils/errors.js';
 import { logger } from '../../utils/logger.js';
 
@@ -73,22 +72,57 @@ export class InstagramProvider extends ProviderInterface {
 
       const html = await res.text();
       const rawOgVideo = this.extractMetaContent(html, 'og:video') || this.extractMetaContent(html, 'og:video:secure_url') || this.extractMetaContent(html, 'twitter:player:stream');
-      const rawOgImage = this.extractMetaContent(html, 'og:image') || this.extractMetaContent(html, 'og:image:secure_url') || this.extractMetaContent(html, 'twitter:image') || this.extractMetaContent(html, 'twitter:image:src');
+      let rawOgImage = this.extractMetaContent(html, 'og:image') || this.extractMetaContent(html, 'og:image:secure_url') || this.extractMetaContent(html, 'twitter:image') || this.extractMetaContent(html, 'twitter:image:src');
       const ogTitle = this.extractMetaContent(html, 'og:title');
       const ogDescription = this.extractMetaContent(html, 'og:description');
 
-      const ogVideo = rawOgVideo ? rawOgVideo.replace(/&amp;/g, '&') : null;
-      const ogImage = rawOgImage ? rawOgImage.replace(/&amp;/g, '&') : '';
-
       let author = '';
-      let title = ogDescription || ogTitle || 'Instagram Media';
+      let title = '';
 
-      if (ogTitle) {
+      // 1. Try extracting exact caption & author from embedded JSON-LD
+      const ldJsonMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/i);
+      if (ldJsonMatch) {
+        try {
+          const parsedLd = JSON.parse(ldJsonMatch[1]);
+          if (parsedLd.caption || parsedLd.description || parsedLd.articleBody) {
+            title = (parsedLd.caption || parsedLd.description || parsedLd.articleBody).trim();
+          }
+          if (parsedLd.thumbnailUrl) {
+            rawOgImage = parsedLd.thumbnailUrl;
+          } else if (parsedLd.image) {
+            rawOgImage = Array.isArray(parsedLd.image) ? parsedLd.image[0] : parsedLd.image;
+          }
+          if (parsedLd.author?.alternateName || parsedLd.author?.name) {
+            author = parsedLd.author.alternateName || parsedLd.author.name;
+          }
+        } catch {
+          // Ignore invalid JSON-LD script blocks
+        }
+      }
+
+      // 2. Extract author from og:title if not already found
+      if (!author && ogTitle) {
         const authorMatch = ogTitle.match(/^([^(@:]+)(?:\s*\(@([^)]+)\))?\s*on\s*Instagram/i);
         if (authorMatch) {
           author = (authorMatch[2] ? `@${authorMatch[2]}` : authorMatch[1]).trim();
         }
       }
+
+      // 3. Extract exact quoted caption from "Username on Instagram: \"The actual caption...\""
+      if (!title) {
+        const quotedMatch = (ogTitle || ogDescription || '').match(/on Instagram:\s*["“]([\s\S]+?)["”]\s*$/i)
+                         || (ogTitle || ogDescription || '').match(/on Instagram:\s*["“]([\s\S]+)/i);
+        if (quotedMatch) {
+          title = quotedMatch[1].trim();
+        } else if (ogDescription && !ogDescription.includes('likes,') && !ogDescription.includes('comments -') && !ogDescription.startsWith('Watch this reel')) {
+          title = ogDescription.trim();
+        } else {
+          title = ogDescription || ogTitle || 'Instagram Media';
+        }
+      }
+
+      const ogVideo = rawOgVideo ? rawOgVideo.replace(/&amp;/g, '&') : null;
+      const ogImage = rawOgImage ? rawOgImage.replace(/&amp;/g, '&') : '';
 
       const isVideo = Boolean(ogVideo) || details.mediaType === 'reel';
 
@@ -96,10 +130,10 @@ export class InstagramProvider extends ProviderInterface {
         id: mediaId,
         url: canonicalUrl,
         type: isVideo ? 'video' : 'photo',
-        title: title.slice(0, 100),
+        title,
         author,
         duration: null,
-        thumbnail: ogImage || '',
+        thumbnail: ogImage,
         directMediaUrl: ogVideo || ogImage || null
       };
     } catch (err) {
@@ -112,19 +146,25 @@ export class InstagramProvider extends ProviderInterface {
     }
   }
 
-  async getMetadataViaYtDlp(url, mediaId, details) {
+  async getMetadataViaYtDlp(url, mediaId, _details) {
     try {
       const info = await ytDlpService.getInfo(url);
       const isVideo = info.ext !== 'jpg' && info.ext !== 'png' && Boolean(info.vcodec || info.video_ext);
+
+      const thumbnails = (info.thumbnails || []).sort((a, b) => (b.preference || 0) - (a.preference || 0));
+      const rawThumbnail = thumbnails[0]?.url || info.thumbnail || '';
+      const thumbnail = rawThumbnail ? rawThumbnail.replace(/&amp;/g, '&') : '';
+
+      const title = info.description?.trim() || info.title?.trim() || 'Instagram Media';
 
       return {
         id: mediaId,
         url,
         type: isVideo ? 'video' : 'photo',
-        title: info.title || info.description?.slice(0, 80) || 'Instagram Media',
-        author: info.uploader ? `@${info.uploader}` : '',
+        title,
+        author: info.uploader ? `@${info.uploader}` : (info.channel || ''),
         duration: info.duration || null,
-        thumbnail: info.thumbnail || '',
+        thumbnail,
         ytFormats: info.formats || [],
         ytInfo: info
       };

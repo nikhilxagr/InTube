@@ -43,7 +43,9 @@ function downloadFile(url, dest, callback) {
         if (!isWindows) {
           try {
             fs.chmodSync(dest, 0o755);
-          } catch {}
+          } catch {
+            // Ignore chmod failure
+          }
         }
         callback(null);
       });

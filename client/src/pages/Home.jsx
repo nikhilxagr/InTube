@@ -15,10 +15,15 @@ import {
   ArrowRight,
   HelpCircle,
   FileCheck2,
-  Sparkles
+  Sparkles,
+  Music,
+  Film,
+  Image as ImageIcon,
+  Smartphone,
+  Wrench
 } from 'lucide-react';
 
-// Facebook SVG — lucide-react doesn't include it
+// Facebook SVG
 function FbIcon({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -28,6 +33,41 @@ function FbIcon({ className }) {
 }
 
 export function Home() {
+  const toolkitFeatures = [
+    {
+      title: 'Video → Audio Converter',
+      desc: 'Extract MP3, M4A, WAV, or OGG soundtracks directly from your local video files.',
+      link: ROUTES.TOOLS_VIDEO_TO_AUDIO,
+      icon: Music,
+      badge: 'Local FFmpeg',
+      variant: 'success'
+    },
+    {
+      title: 'Video Format Converter',
+      desc: 'Convert media to MP4, WebM, and MOV with customizable encoding presets.',
+      link: ROUTES.TOOLS_CONVERTER,
+      icon: Film,
+      badge: 'Fast Transcode',
+      variant: 'brand'
+    },
+    {
+      title: 'HD Thumbnail Downloader',
+      desc: 'Retrieve and save high-resolution official cover images from public URLs.',
+      link: ROUTES.TOOLS_THUMBNAIL,
+      icon: ImageIcon,
+      badge: 'Official Covers',
+      variant: 'youtube'
+    },
+    {
+      title: 'QR Mobile Transfer',
+      desc: 'Send converted files and downloads directly to your phone without cables.',
+      link: ROUTES.TOOLS_QR_TRANSFER,
+      icon: Smartphone,
+      badge: 'Zero Cable',
+      variant: 'secondary'
+    }
+  ];
+
   const popularTools = [
     { title: 'YouTube Video', desc: 'Extract MP4 HD streams (1080p, 720p, 480p) from public YouTube videos.', link: ROUTES.YOUTUBE_VIDEO, badge: 'YouTube', variant: 'youtube' },
     { title: 'YouTube Shorts', desc: 'Fast, direct download of public vertical short-form video clips.', link: ROUTES.YOUTUBE_SHORTS, badge: 'YouTube', variant: 'youtube' },
@@ -53,7 +93,6 @@ export function Home() {
     { icon: FileCheck2,       title: 'Clean & Compliant',      desc: 'Engineered strictly for authorized public content without bypassing DRM or paywalls.' }
   ];
 
-  // Icon color cycling: YT red → IG pink → IG purple → FB blue → purple → red
   const featureColors = [
     'text-red-500 dark:text-red-400',
     'text-pink-500 dark:text-pink-400',
@@ -66,16 +105,16 @@ export function Home() {
   const faqs = [
     { q: 'Do I need to create an account or provide payment information?', a: 'No. InTube is completely free and stateless. We do not require accounts, logins, or user credentials.' },
     { q: 'Does InTube store copies of downloaded files on its servers?', a: 'Never. Media is processed in an isolated ephemeral directory and deleted immediately upon download completion, client disconnect, or error.' },
-    { q: 'Can I download private posts or private videos?', a: 'No. InTube strictly respects platform privacy controls. Only publicly accessible media can be analyzed and processed.' },
-    { q: 'Which formats and quality options are supported?', a: 'Depending on the source, you can download MP4 videos (1080p, 720p, 480p) and MP3/M4A audio across YouTube, Instagram, and Facebook.' }
+    { q: 'Can I convert local files on my computer?', a: 'Yes! Check out our Media Toolbox for local Video to Audio, Video Format Converter, and Metadata Inspection.' },
+    { q: 'How does QR transfer to phone work?', a: 'Whenever you process or download a file, generate a temporary QR code. Scan it with your phone camera to download the file directly to mobile.' }
   ];
 
   return (
     <div className="space-y-16 sm:space-y-24">
       <SEO
-        title="InTube — YouTube Video Downloader, Shorts & MP3 Converter | Nikhil Projects"
-        description="InTube by Nikhil Projects is the ultimate fast, free, and privacy-first online media downloader. Download YouTube 4K/1080p videos, Shorts, MP3 audio, Instagram Reels, and Facebook videos."
-        keywords="Nikhil Projects, Nikhil youtube video downloader, yt downloader, youtube downloader, youtube to mp3, youtube shorts downloader, 4k youtube downloader, instagram reels downloader, facebook video downloader, intube, intubedl"
+        title="InTube — Universal Media Toolkit & Video Downloader | Nikhil Projects"
+        description="InTube by Nikhil Projects is a comprehensive Universal Media Toolkit: YouTube, Instagram & Facebook downloader, Video to Audio converter, format transcode, and QR transfer."
+        keywords="Universal media toolkit, Nikhil Projects, Nikhil youtube video downloader, yt downloader, video to mp3, video format converter, qr media transfer, youtube shorts downloader, instagram reels downloader, facebook video downloader, intube, intubedl"
       />
 
       {/* ── Hero ── */}
@@ -88,17 +127,17 @@ export function Home() {
             color: '#c084fc'
           }}>
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Nikhil Projects • YouTube · Instagram · Facebook All-in-One Downloader</span>
+          <span>Universal Media Toolkit • Downloader · Converters · Utilities · QR Transfer</span>
         </div>
 
         {/* Headline */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.08]">
-          Download media,{' '}
+          Universal media tools,{' '}
           <span className="text-gradient-tri">your way.</span>
         </h1>
 
         <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          Paste any public link from YouTube, Instagram, or Facebook — choose your quality and download in seconds. No accounts, no ads, no tracking.
+          Download from YouTube, Instagram, and Facebook, extract studio audio, transcode video formats, and beam files to your phone. 100% free and private.
         </p>
 
         {/* Downloader with animated tri-colour border */}
@@ -107,13 +146,66 @@ export function Home() {
         </div>
       </section>
 
+      {/* ── More Than A Downloader: Toolkit Discovery ── */}
+      <section className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+              <Wrench className="w-3.5 h-3.5" />
+              <span>More Than A Downloader</span>
+            </div>
+            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">
+              Media Processing Suite
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Convert, extract, inspect, and transfer your media files without installing software.
+            </p>
+          </div>
+          <Link
+            to={ROUTES.TOOLS}
+            className="text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1.5 shrink-0"
+          >
+            Explore All Media Tools <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {toolkitFeatures.map((tool) => (
+            <Link key={tool.link} to={tool.link} className="focus:outline-none flex">
+              <Card className="p-5 hover:border-purple-500/50 hover:shadow-xl transition-all h-full flex flex-col justify-between group bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 rounded-2xl w-full">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 group-hover:bg-purple-50 dark:group-hover:bg-purple-950/60 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors shadow-sm">
+                      <tool.icon className="w-5 h-5" />
+                    </div>
+                    <Badge size="sm" variant={tool.variant}>
+                      {tool.badge}
+                    </Badge>
+                  </div>
+
+                  <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                    {tool.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    {tool.desc}
+                  </p>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1">
+                  Launch Utility <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* ── Platform pills ── */}
       <section className="text-center space-y-5">
         <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-          Supported Public Platforms
+          Supported Public URL Platforms
         </h2>
         <div className="flex flex-wrap items-center justify-center gap-4">
-          {/* YouTube */}
           <Link to={ROUTES.YOUTUBE}
             className="platform-pill flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-red-200/60 dark:border-red-900/40 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm shadow-sm hover:shadow-red-500/20 hover:shadow-lg hover:border-red-500/60 transition-all">
             <div className="w-6 h-6 rounded-lg bg-red-50 dark:bg-red-950/60 flex items-center justify-center text-red-600">
@@ -122,7 +214,6 @@ export function Home() {
             <span>YouTube Videos &amp; Shorts</span>
           </Link>
 
-          {/* Instagram */}
           <Link to={ROUTES.INSTAGRAM}
             className="platform-pill flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-pink-200/60 dark:border-pink-900/40 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm shadow-sm hover:shadow-pink-500/20 hover:shadow-lg hover:border-pink-500/60 transition-all">
             <div className="w-6 h-6 rounded-lg bg-pink-50 dark:bg-pink-950/60 flex items-center justify-center text-pink-600">
@@ -131,7 +222,6 @@ export function Home() {
             <span>Instagram Reels &amp; Posts</span>
           </Link>
 
-          {/* Facebook */}
           <Link to={ROUTES.FACEBOOK}
             className="platform-pill flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-blue-200/60 dark:border-blue-900/40 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm shadow-sm hover:shadow-blue-500/20 hover:shadow-lg hover:border-blue-500/60 transition-all">
             <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center text-blue-600">
@@ -146,7 +236,7 @@ export function Home() {
       <section className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Popular Tools</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Popular Downloaders</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Direct extractors for specific media types.</p>
           </div>
           <Link to={ROUTES.TOOLS} className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1">
