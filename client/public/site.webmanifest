@@ -1,0 +1,18 @@
+{
+  "name": "InTube — YouTube Video Downloader | Nikhil Projects",
+  "short_name": "InTube",
+  "description": "Fast, high-quality YouTube, Instagram, and Facebook media downloader built by Nikhil Projects.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0284c7",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

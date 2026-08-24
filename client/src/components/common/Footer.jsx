@@ -117,8 +117,8 @@ export function Footer() {
         </div>
 
         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <p>© {new Date().getFullYear()} InTube. All rights reserved.</p>
-          <p className="text-center sm:text-right">Stateless • Zero Accounts • Open Standards</p>
+          <p>© {new Date().getFullYear()} InTube. A <span className="font-semibold text-slate-700 dark:text-slate-300">Nikhil Projects</span> initiative. All rights reserved.</p>
+          <p className="text-center sm:text-right">Nikhil YT Downloader • Stateless • Zero Accounts • 100% Privacy</p>
         </div>
       </div>
     </footer>

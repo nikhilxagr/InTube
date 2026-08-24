@@ -73,8 +73,9 @@ export function Home() {
   return (
     <div className="space-y-16 sm:space-y-24">
       <SEO
-        title="InTube — Download YouTube, Instagram & Facebook Media"
-        description="Fast, stateless, privacy-focused media utility. Paste any public YouTube, Instagram, or Facebook link, choose your format, and download instantly."
+        title="InTube — YouTube Video Downloader, Shorts & MP3 Converter | Nikhil Projects"
+        description="InTube by Nikhil Projects is the ultimate fast, free, and privacy-first online media downloader. Download YouTube 4K/1080p videos, Shorts, MP3 audio, Instagram Reels, and Facebook videos."
+        keywords="Nikhil Projects, Nikhil youtube video downloader, yt downloader, youtube downloader, youtube to mp3, youtube shorts downloader, 4k youtube downloader, instagram reels downloader, facebook video downloader, intube, intubedl"
       />
 
       {/* ── Hero ── */}
@@ -87,7 +88,7 @@ export function Home() {
             color: '#c084fc'
           }}>
           <Sparkles className="w-3.5 h-3.5" />
-          <span>YouTube · Instagram · Facebook — All in One</span>
+          <span>Nikhil Projects • YouTube · Instagram · Facebook All-in-One Downloader</span>
         </div>
 
         {/* Headline */}

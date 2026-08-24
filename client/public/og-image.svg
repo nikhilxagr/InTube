@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e1b4b" />
+    </linearGradient>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444" />
+      <stop offset="50%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="60" result="blur" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)" />
+
+  <!-- Ambient Glow -->
+  <circle cx="200" cy="150" r="250" fill="#3b82f6" opacity="0.15" filter="url(#glow)" />
+  <circle cx="1000" cy="450" r="280" fill="#ec4899" opacity="0.15" filter="url(#glow)" />
+
+  <!-- Brand Card Container -->
+  <rect x="80" y="80" width="1040" height="470" rx="24" fill="#ffffff" fill-opacity="0.03" stroke="#ffffff" stroke-opacity="0.1" stroke-width="1.5" />
+
+  <!-- Logo Icon -->
+  <rect x="140" y="140" width="76" height="76" rx="20" fill="url(#brandGrad)" />
+  <path d="M168 162 L192 178 L168 194 Z" fill="#ffffff" />
+
+  <!-- Brand Title -->
+  <text x="236" y="194" font-family="system-ui, -apple-system, sans-serif" font-size="46" font-weight="800" fill="#ffffff" letter-spacing="-0.03em">InTube</text>
+  <text x="400" y="194" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="600" fill="#38bdf8" letter-spacing="0.05em">BY NIKHIL PROJECTS</text>
+
+  <!-- Main Headline -->
+  <text x="140" y="290" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="800" fill="#ffffff" letter-spacing="-0.02em">
+    Ultimate Fast &amp; Free
+  </text>
+  <text x="140" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="800" fill="url(#textGrad)" letter-spacing="-0.02em">
+    YouTube &amp; Media Downloader
+  </text>
+
+  <!-- Description / Subtitle -->
+  <text x="140" y="415" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="400" fill="#94a3b8">
+    Download 4K UHD, 1080p, YouTube Shorts, MP3 Audio, Instagram Reels &amp; Facebook Videos.
+  </text>
+
+  <!-- Feature Pills -->
+  <g transform="translate(140, 460)">
+    <!-- Pill 1 -->
+    <rect x="0" y="0" width="160" height="42" rx="21" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.15" />
+    <text x="80" y="26" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="600" fill="#38bdf8">⚡ Ultra Fast</text>
+
+    <!-- Pill 2 -->
+    <rect x="175" y="0" width="160" height="42" rx="21" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.15" />
+    <text x="255" y="26" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="600" fill="#4ade80">🔒 100% Privacy</text>
+
+    <!-- Pill 3 -->
+    <rect x="350" y="0" width="160" height="42" rx="21" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.15" />
+    <text x="430" y="26" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="600" fill="#f472b6">🎵 320kbps MP3</text>
+
+    <!-- Pill 4 -->
+    <rect x="525" y="0" width="160" height="42" rx="21" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.15" />
+    <text x="605" y="26" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="600" fill="#fbbf24">📺 4K UHD Quality</text>
+  </g>
+
+  <!-- URL watermark -->
+  <text x="1060" y="525" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="500" fill="#64748b">intubedl.vercel.app</text>
+</svg>

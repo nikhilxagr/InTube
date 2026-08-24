@@ -1,4 +1,10 @@
+# InTube Robots.txt
+# Allows indexing for all search engine bots (Google, Bing, Yahoo, DuckDuckGo, Yandex, Baidu)
 User-agent: *
 Allow: /
 
-Sitemap: https://intube.vercel.app/sitemap.xml
+# Disallow indexing of raw backend API or non-content files
+Disallow: /api/
+
+# Sitemap location for Google Search Console
+Sitemap: https://intubedl.vercel.app/sitemap.xml
