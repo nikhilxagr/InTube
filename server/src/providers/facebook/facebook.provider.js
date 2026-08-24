@@ -33,7 +33,8 @@ export class FacebookProvider extends ProviderInterface {
       const thumbnails = (info.thumbnails || []).sort(
         (a, b) => (b.preference || 0) - (a.preference || 0)
       );
-      const thumbnail = thumbnails[0]?.url || info.thumbnail || '';
+      const rawThumb = thumbnails[0]?.url || info.thumbnail || '';
+      const thumbnail = rawThumb ? rawThumb.replace(/&amp;/g, '&') : '';
 
       return {
         id: info.id || String(Date.now()),

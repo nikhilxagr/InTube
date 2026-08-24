@@ -72,10 +72,13 @@ export class InstagramProvider extends ProviderInterface {
       }
 
       const html = await res.text();
-      const ogVideo = this.extractMetaContent(html, 'og:video') || this.extractMetaContent(html, 'og:video:secure_url');
-      const ogImage = this.extractMetaContent(html, 'og:image') || this.extractMetaContent(html, 'og:image:secure_url');
+      const rawOgVideo = this.extractMetaContent(html, 'og:video') || this.extractMetaContent(html, 'og:video:secure_url') || this.extractMetaContent(html, 'twitter:player:stream');
+      const rawOgImage = this.extractMetaContent(html, 'og:image') || this.extractMetaContent(html, 'og:image:secure_url') || this.extractMetaContent(html, 'twitter:image') || this.extractMetaContent(html, 'twitter:image:src');
       const ogTitle = this.extractMetaContent(html, 'og:title');
       const ogDescription = this.extractMetaContent(html, 'og:description');
+
+      const ogVideo = rawOgVideo ? rawOgVideo.replace(/&amp;/g, '&') : null;
+      const ogImage = rawOgImage ? rawOgImage.replace(/&amp;/g, '&') : '';
 
       let author = '';
       let title = ogDescription || ogTitle || 'Instagram Media';

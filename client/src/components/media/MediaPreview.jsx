@@ -1,4 +1,5 @@
-import { Clock, User, Download, RefreshCw, Layers, Sparkles, Gauge, Hourglass, Film, Zap } from 'lucide-react';
+import { useState } from 'react';
+import { Clock, User, Download, RefreshCw, Layers, Sparkles, Gauge, Hourglass, Film, Zap, Play, Image as ImageIcon } from 'lucide-react';
 import { Card } from '../common/Card.jsx';
 import { Button } from '../common/Button.jsx';
 import { Badge } from '../common/Badge.jsx';
@@ -14,6 +15,8 @@ export function MediaPreview({
   downloadProgress = null,
   countdown = null
 }) {
+  const [imgError, setImgError] = useState(false);
+
   if (!media) return null;
 
   const formatDuration = (seconds) => {
@@ -49,28 +52,65 @@ export function MediaPreview({
     statusText = downloadProgress.statusText;
   }
 
+  const renderFallbackCard = () => {
+    if (media.platform === 'instagram') {
+      return (
+        <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center text-white"
+          style={{ background: 'linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)' }}>
+          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-2 shadow-inner">
+            <Film className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-xs font-bold tracking-wide uppercase drop-shadow">Instagram {media.type === 'photo' ? 'Photo' : 'Reel'}</span>
+        </div>
+      );
+    }
+
+    if (media.platform === 'facebook') {
+      return (
+        <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center text-white"
+          style={{ background: 'linear-gradient(135deg, #1877f2 0%, #0d5cb6 100%)' }}>
+          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-2 shadow-inner">
+            <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+          </div>
+          <span className="text-xs font-bold tracking-wide uppercase drop-shadow">Facebook Video</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center text-white"
+        style={{ background: 'linear-gradient(135deg, #ef4444 0%, #991b1b 100%)' }}>
+        <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-2 shadow-inner">
+          <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+        </div>
+        <span className="text-xs font-bold tracking-wide uppercase drop-shadow">Media Preview</span>
+      </div>
+    );
+  };
+
   return (
     <Card className="p-5 sm:p-7 space-y-6 shadow-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl">
       <div className="flex flex-col sm:flex-row gap-5 items-start">
-        {media.thumbnail ? (
-          <div className="relative w-full sm:w-52 aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700 shadow-md group">
+        <div className="relative w-full sm:w-52 aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700 shadow-md group">
+          {media.thumbnail && !imgError ? (
             <img
               src={media.thumbnail}
               alt={media.title || 'Media thumbnail'}
+              referrerPolicy="no-referrer"
+              crossOrigin="anonymous"
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               loading="lazy"
+              onError={() => setImgError(true)}
             />
-            {durationStr && (
-              <span className="absolute bottom-2 right-2 px-1.5 py-0.5 text-[11px] font-bold bg-black/85 text-white rounded-md tracking-wider shadow-sm backdrop-blur-sm">
-                {durationStr}
-              </span>
-            )}
-          </div>
-        ) : (
-          <div className="w-full sm:w-52 aspect-video rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 text-xs shrink-0 border border-slate-200 dark:border-slate-700">
-            No Preview Available
-          </div>
-        )}
+          ) : (
+            renderFallbackCard()
+          )}
+          {durationStr && (
+            <span className="absolute bottom-2 right-2 px-1.5 py-0.5 text-[11px] font-bold bg-black/85 text-white rounded-md tracking-wider shadow-sm backdrop-blur-sm">
+              {durationStr}
+            </span>
+          )}
+        </div>
 
         <div className="flex-1 min-w-0 space-y-2.5">
           <div className="flex flex-wrap items-center gap-2">
